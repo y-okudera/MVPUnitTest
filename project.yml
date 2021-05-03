@@ -1,0 +1,333 @@
+# https://github.com/yonaskolb/XcodeGen/blob/master/Docs/ProjectSpec.md
+
+# プロジェクト名（MVPApp）で検索して、適切なプロジェクト名に置換する
+
+# プロジェクト全体の設定
+name: MVPApp
+fileGroups: [MVPApp]
+configs:
+  develop-debug: debug
+  develop-release: release
+  production-debug: debug
+  production-release: release
+options:
+  minimumXcodeGenVersion: "2.19.0"
+  usesTabs: false
+  indentWidth: 4
+  tabWidth: 4
+  deploymentTarget:
+    iOS: "13.0"
+  developmentLanguage: ja
+attributes:
+  ORGANIZATIONNAME: ""
+
+####################
+
+# hoge_app -> MVPApp (app)
+# 以下の4つの組み合わせで定義する
+## 1. 共通定義
+## 2. ビルド定義
+## 3. 環境定義
+## 4. 環境&ビルド毎のプロビジョニングプロファイル定義
+
+settingGroups:
+  # Configurationによらない共通定義
+  common_app:
+    PRODUCT_BUNDLE_IDENTIFIER: "jp.yuoku.MVPApp.$(BUNDLE_ID_SUFFIX)"
+    SWIFT_VERSION: "5.0"
+    CLANG_ENABLE_OBJC_WEAK: YES
+    MTL_FAST_MATH: YES
+    CODE_SIGN_STYLE: Manual
+    TARGETED_DEVICE_FAMILY: "1,2"
+    SWIFT_OBJC_BRIDGING_HEADER: $(SRCROOT)/$(PROJECT)/Application/Resource/MVPApp-Header.h
+    CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
+    OTHER_LINKER_FLAGS: $(inherited) -ObjC
+
+  # debugビルド定義
+  build_debug:
+    CODE_SIGN_IDENTITY: iPhone Developer
+    DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+    MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
+    APS_ENVIRONMENT: development
+  # releaseビルド定義
+  build_release:
+    CODE_SIGN_IDENTITY: iPhone Distribution
+    DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+    SWIFT_OPTIMIZATION_LEVEL: "-O"
+    SWIFT_COMPILATION_MODE: wholemodule
+    CLANG_ANALYZER_NONNULL: YES
+    CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION: YES_AGGRESSIVE
+    MTL_ENABLE_DEBUG_INFO: NO
+    ENABLE_NS_ASSERTIONS: NO
+    ENABLE_STRICT_OBJC_MSGSEND: YES
+    VALIDATE_PRODUCT: YES
+    APS_ENVIRONMENT: production
+
+  # develop環境定義
+  scheme_dev:
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEV
+    BUNDLE_ID_SUFFIX: "-dev"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: B8PR34D6DP
+  # 本番環境定義
+  scheme_production:
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: PROD
+    BUNDLE_ID_SUFFIX: ""
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: B8PR34D6DP
+
+  # develop環境・debugビルド
+  provi_dev_debug:
+    PROVISIONING_PROFILE_SPECIFIER: MVPApp-develop-debug
+  # develop環境・releaseビルド
+  provi_dev_release:
+    PROVISIONING_PROFILE_SPECIFIER: MVPApp-develop-debug # FIXME
+  # 本番環境・debugビルド
+  provi_production_debug:
+    PROVISIONING_PROFILE_SPECIFIER: MVPApp-production-debug
+  # 本番環境・releaseビルド（App Storeリリース用）
+  provi_production_release:
+    PROVISIONING_PROFILE_SPECIFIER: MVPApp-production-debug # FIXME
+
+  ## フレームワーク
+  # 共通定義
+  common_framework:
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+  # develop環境定義
+  build_dev_framework:
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEV
+  # 本番環境定義
+  build_production_framework:
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: PRODUCTION
+  # Dataフレームワーク
+  data_framework:
+    PRODUCT_BUNDLE_IDENTIFIER: 'data$(BUNDLE_ID_SUFFIX)'
+    SWIFT_OBJC_BRIDGING_HEADER: $(SRCROOT)/Data/Resource/Data-Header.h
+  # Domainフレームワーク
+  domain_framework:
+    PRODUCT_BUNDLE_IDENTIFIER: 'domain$(BUNDLE_ID_SUFFIX)'
+    SWIFT_OBJC_BRIDGING_HEADER: $(SRCROOT)/Domain/Resource/Domain-Header.h
+  # Presentationフレームワーク
+  presentation_framework:
+    PRODUCT_BUNDLE_IDENTIFIER: 'presentation$(BUNDLE_ID_SUFFIX)'
+    SWIFT_OBJC_BRIDGING_HEADER: $(SRCROOT)/Presentation/Resource/Presentation-Header.h
+
+####################
+
+# ビルドターゲット
+targets:
+  # AppMainターゲット
+  MVPApp:
+    type: application
+    platform: iOS
+    settings:
+      configs:
+        develop-debug: # dev環境debugビルド
+          groups: [common_app, build_debug, scheme_dev, provi_dev_debug]
+        develop-release: # dev環境releaseビルド（Ad Hoc配信用）
+          groups: [common_app, build_release, scheme_dev, provi_dev_release]
+        production-debug: # 本番環境debugビルド
+          groups: [common_app, build_release, scheme_production, provi_production_debug]
+        production-release: # 本番環境releaseビルド（App Storeリリース用）
+          groups: [common_app, build_release, scheme_production, provi_production_release]
+    sources:
+      - path: MVPApp
+        excludes:
+          - "**/.gitkeep"
+          - "**/*.md"
+    dependencies:
+      - target: Data
+      - target: Domain
+      - target: Presentation
+    postCompileScripts:
+      - path: ./scripts/XcodeGen/mint_run_swiftlint.sh
+        name: SwiftLint
+    # Info.plist
+    info:
+      path: MVPApp/Application/Generated/Info.plist
+      properties:
+        CFBundleDisplayName: MVPApp
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLSchemes: [MVPApp]
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationLandscapeLeft
+        UIUserInterfaceStyle: Light
+        UIViewControllerBasedStatusBarAppearance: false
+        UILaunchStoryboardName: LaunchScreen
+        UIRequiredDeviceCapabilities: [armv7]
+        LSRequiresIPhoneOS: true
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default Configuration
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+####################
+  # Dataフレームワーク
+  Data:
+    type: framework
+    platform: iOS
+    settings:
+      configs:
+        develop-debug: # dev環境debugビルド
+          groups: [common_framework, build_dev_framework, data_framework]
+        develop-release: # dev環境releaseビルド（Ad Hoc配信用）
+          groups: [common_framework, build_dev_framework, data_framework]
+        production-debug: # 本番環境debugビルド
+          groups: [common_framework, build_production_framework, data_framework]
+        production-release: # 本番環境releaseビルド（App Storeリリース用）
+          groups: [common_framework, build_production_framework, data_framework]
+    sources:
+      - path: Data
+        excludes:
+          - "**/.gitkeep"
+          - "**/*.md"
+    dependencies:
+      - carthage: Alamofire
+      - carthage: Realm
+      - carthage: RealmSwift
+    info:
+      path: Data/Resource/Generated/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+####################
+  # Domainフレームワーク
+  Domain:
+    type: framework
+    platform: iOS
+    settings:
+      configs:
+        develop-debug: # dev環境debugビルド
+          groups: [common_framework, build_dev_framework, domain_framework]
+        develop-release: # dev環境releaseビルド（Ad Hoc配信用）
+          groups: [common_framework, build_dev_framework, domain_framework]
+        production-debug: # 本番環境debugビルド
+          groups: [common_framework, build_production_framework, domain_framework]
+        production-release: # 本番環境releaseビルド（App Storeリリース用）
+          groups: [common_framework, build_production_framework, domain_framework]
+    sources:
+      - path: Domain
+        excludes:
+          - "**/.gitkeep"
+          - "**/*.md"
+    dependencies:
+      - target: Data
+    info:
+      path: Domain/Resource/Generated/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+ ####################
+   # Presentationフレームワーク
+  Presentation:
+    type: framework
+    platform: iOS
+    settings:
+      configs:
+        develop-debug: # dev環境debugビルド
+          groups: [common_framework, build_dev_framework, presentation_framework]
+        develop-release: # dev環境releaseビルド（Ad Hoc配信用）
+          groups: [common_framework, build_dev_framework, presentation_framework]
+        production-debug: # 本番環境debugビルド
+          groups: [common_framework, build_production_framework, presentation_framework]
+        production-release: # 本番環境releaseビルド（App Storeリリース用）
+          groups: [common_framework, build_production_framework, presentation_framework]
+    sources:
+      - path: Presentation
+        excludes:
+          - "**/.gitkeep"
+          - "**/*.md"
+    dependencies:
+      - target: Domain
+      - carthage: Nuke
+    info:
+      path: Presentation/Resource/Generated/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+ ####################
+  # UnitTestターゲット
+  MVPAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    settings:
+      ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+      BUNDLE_NAME: 'MVPApp.tests'
+    sources: MVPAppTests
+    dependencies:
+      - target: MVPApp
+#####################
+  # UITestターゲット
+  MVPAppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    settings:
+      ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+      BUNDLE_NAME: 'MVPApp.uitests'
+    sources: MVPAppUITests
+    dependencies:
+      - target: MVPApp
+
+#####################
+
+# スキーム定義
+schemeTemplates:
+  MVPAppScheme:
+    build:
+      targets:
+        MVPApp: all
+        MVPAppTests: [test]
+        MVPAppUITests: [test]
+    run:
+      config: ${debugConfig}
+    test:
+      config: ${debugConfig}
+      targets:
+        - MVPAppTests
+        - MVPAppUITests
+    profile:
+      config: ${releaseConfig}
+    analyze:
+      config: ${debugConfig}
+    archive:
+      config: ${releaseConfig}
+schemes:
+  develop:
+    templates: [MVPAppScheme]
+    templateAttributes:
+      debugConfig: develop-debug
+      releaseConfig: develop-release
+  production:
+    templates: [MVPAppScheme]
+    templateAttributes:
+      debugConfig: production-debug
+      releaseConfig: production-release

@@ -1,0 +1,24 @@
+# Template information section
+name: "mvp"
+summary: "This template is original MVP template."
+author: "yuoku"
+version: "1.0.0"
+license: "MIT"
+
+# The declarations for code files
+
+code_files:
+
+# ViewController
+- {name: ViewController/ViewController.swift, path: Code/ViewController/viewcontroller.swift.liquid}
+- {name: ViewController/ViewController.storyboard, path: Code/ViewController/viewcontroller.storyboard.liquid}
+
+# Presenter
+- {name: Presenter/Presenter.swift, path: Code/Presenter/presenter.swift.liquid}
+
+# Wireframe
+- {name: Wireframe/Wireframe.swift, path: Code/Wireframe/wireframe.swift.liquid}
+- {name: Wireframe/TransitToWireframe.swift, path: Code/Wireframe/transittowireframe.swift.liquid, custom_name: "TransitTo{{ module_info.name }}Wireframe.swift"}
+
+# Builder
+- {name: Builder/Builder.swift, path: Code/Builder/builder.swift.liquid}

@@ -1,0 +1,23 @@
+//
+//  {{ module_info.file_name }}
+//  {{ module_info.project_name }}
+//
+//  Created by {{ developer.name }} on {{ date }}.
+//  Copyright © {{ year }} {{ developer.company }}. All rights reserved.
+//
+
+import Domain
+import UIKit
+
+enum {{ module_info.name }}Builder {
+
+    static func build() -> UIViewController {
+        let viewController = {{ module_info.name }}ViewController.instantiate()
+        let wireframe = {{ module_info.name }}WireframeProvider.provide(viewController: viewController)
+        let presenter = {{ module_info.name }}PresenterProvider.provide(view: viewController, wireframe: wireframe)
+
+        viewController.presenter = presenter
+
+        return viewController
+    }
+}

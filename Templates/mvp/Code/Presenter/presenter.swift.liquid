@@ -1,0 +1,33 @@
+//
+//  {{ module_info.file_name }}
+//  {{ module_info.project_name }}
+//
+//  Created by {{ developer.name }} on {{ date }}.
+//  Copyright © {{ year }} {{ developer.company }}. All rights reserved.
+//
+
+import Domain
+
+enum {{ module_info.name }}PresenterProvider {
+
+    static func provide(view: {{ module_info.name }}View?, wireframe: {{ module_info.name }}Wireframe) -> {{ module_info.name }}Presenter {
+        return {{ module_info.name }}PresenterImpl(view: view, wireframe: wireframe)
+    }
+}
+
+protocol {{ module_info.name }}Presenter: AnyObject {
+
+    var view: {{ module_info.name }}View? { get set }
+    var wireframe: {{ module_info.name }}Wireframe { get set }
+}
+
+final class {{ module_info.name }}PresenterImpl: {{ module_info.name }}Presenter {
+
+    weak var view: {{ module_info.name }}View?
+    var wireframe: {{ module_info.name }}Wireframe
+
+    init(view: {{ module_info.name }}View?, wireframe: {{ module_info.name }}Wireframe) {
+        self.view = view
+        self.wireframe = wireframe
+    }
+}

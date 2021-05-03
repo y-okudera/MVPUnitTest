@@ -1,0 +1,12 @@
+strings:
+  inputs:
+    - Presentation/Resource/Strings/Localizable.strings
+  outputs:
+    - templateName: structured-swift5
+      output: Presentation/Resource/Strings/Generated/L10n-Constants.swift
+xcassets:
+  inputs:
+    - Presentation/Resource/Assets/Assets.xcassets
+  outputs:
+    - templateName: swift5
+      output: Presentation/Resource/Assets/Generated/Assets.swift

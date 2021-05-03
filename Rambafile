@@ -1,0 +1,24 @@
+### Headers settings
+company: yuoku
+
+### Xcode project settings
+project_name: MVPApp
+xcodeproj_path: MVPApp.xcodeproj
+
+### Code generation settings section
+# The main project target name
+project_target: MVPApp
+
+# The file path for new modules
+project_file_path: Presentation/Scene
+
+# The Xcode group path to new modules
+project_group_path: Presentation/Scene
+
+### Dependencies settings section
+podfile_path: Podfile
+cartfile_path: Cartfile
+
+### Templates
+templates:
+- {name: mvp, local: Templates}

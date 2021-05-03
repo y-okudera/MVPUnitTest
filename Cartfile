@@ -1,0 +1,6 @@
+## Networking
+github "Alamofire/Alamofire" == 5.4.3
+github "kean/Nuke" == 9.6.0
+
+## DB
+github "realm/realm-cocoa" == 10.7.4

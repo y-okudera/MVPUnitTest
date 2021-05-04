@@ -14,7 +14,11 @@ public enum HomeBuilder {
     public static func build() -> UIViewController {
         let viewController = HomeViewController.instantiate()
         let wireframe = HomeWireframeProvider.provide(viewController: viewController)
-        let presenter = HomePresenterProvider.provide(view: viewController, wireframe: wireframe)
+        let presenter = HomePresenterProvider.provide(
+            view: viewController,
+            wireframe: wireframe,
+            homeUseCase: HomeUseCaseProvider.provide()
+        )
 
         viewController.presenter = presenter
 

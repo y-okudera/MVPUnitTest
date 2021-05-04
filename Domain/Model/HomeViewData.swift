@@ -8,7 +8,11 @@
 import Foundation
 
 public struct HomeViewData {
-    public let data: [GitHubUser]
+    public var data: [GitHubUser]
+
+    public init(data: [GitHubUser]) {
+        self.data = data
+    }
 }
 
 public struct GitHubUser {

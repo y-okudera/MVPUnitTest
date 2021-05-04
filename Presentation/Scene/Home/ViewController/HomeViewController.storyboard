@@ -16,13 +16,33 @@
                     <view key="view" contentMode="scaleToFill" id="JvT-XJ-n7e">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Kqw-56-Tt3">
+                                <rect key="frame" x="0.0" y="44" width="375" height="734"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="9H7-2S-u5F" id="5xb-0p-G1l"/>
+                                    <outlet property="delegate" destination="9H7-2S-u5F" id="XYu-Mv-b7G"/>
+                                    <outlet property="prefetchDataSource" destination="9H7-2S-u5F" id="V4O-MI-uqI"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="wYo-CJ-1Ez"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Kqw-56-Tt3" firstAttribute="trailing" secondItem="wYo-CJ-1Ez" secondAttribute="trailing" id="9rV-CW-EXw"/>
+                            <constraint firstItem="Kqw-56-Tt3" firstAttribute="top" secondItem="wYo-CJ-1Ez" secondAttribute="top" id="Ck9-rV-phG"/>
+                            <constraint firstItem="Kqw-56-Tt3" firstAttribute="bottom" secondItem="wYo-CJ-1Ez" secondAttribute="bottom" id="Etz-mF-pcc"/>
+                            <constraint firstItem="Kqw-56-Tt3" firstAttribute="leading" secondItem="wYo-CJ-1Ez" secondAttribute="leading" id="Rhk-cO-Vgr"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="Kqw-56-Tt3" id="d53-OM-wUI"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nay-R4-6PX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-439" y="-16"/>
+            <point key="canvasLocation" x="-439.19999999999999" y="-16.256157635467982"/>
         </scene>
     </scenes>
     <resources>

@@ -5,6 +5,7 @@
 //  Created by okudera on 2021/04/30.
 //
 
+import NVActivityIndicatorView
 import UIKit
 
 extension UIViewController {
@@ -25,5 +26,26 @@ extension UIViewController {
     /// - Returns: ViewController's instance.
     static func instantiate() -> Self {
         return instantiate(storyboardName: className, storyboardID: className)
+    }
+}
+
+extension UIViewController {
+
+    private var activityIndicatorView: NVActivityIndicatorView? {
+        return view.findViews(subclassOf: NVActivityIndicatorView.self).first
+    }
+
+    func addActivityIndicatorView() {
+        let activityIndicatorView = NVActivityIndicatorView.make()
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.center = view.center
+    }
+
+    func startAnimating() {
+        activityIndicatorView?.startAnimating()
+    }
+
+    func stopAnimating() {
+        activityIndicatorView?.stopAnimating()
     }
 }

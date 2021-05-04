@@ -1,3 +1,4 @@
 github "Alamofire/Alamofire" "5.4.3"
 github "kean/Nuke" "9.6.0"
+github "ninjaprox/NVActivityIndicatorView" "5.1.1"
 github "realm/realm-cocoa" "v10.7.4"

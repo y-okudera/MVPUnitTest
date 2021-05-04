@@ -15,8 +15,8 @@ enum HomeWireframeProvider {
     }
 }
 
-protocol HomeWireframe: AnyObject {
-    var viewController: UIViewController? { get set }
+protocol HomeWireframe: TransitToExternalBrowserWireframe {
+    var viewController: UIViewController? { get }
 }
 
 final class HomeWireframeImpl: HomeWireframe {

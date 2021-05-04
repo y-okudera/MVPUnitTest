@@ -9,7 +9,7 @@
 import UIKit
 
 protocol TransitToHomeWireframe: AnyObject {
-    var viewController: UIViewController? { get set }
+    var viewController: UIViewController? { get }
 
     /*
      *  EXAMPLE:

@@ -263,6 +263,8 @@ targets:
     dependencies:
       - target: Domain
       - carthage: Nuke
+      - carthage: NVActivityIndicatorView
+      - carthage: NVActivityIndicatorViewExtended
     info:
       path: Presentation/Resource/Generated/Info.plist
       properties:

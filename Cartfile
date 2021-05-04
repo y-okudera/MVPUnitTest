@@ -4,3 +4,6 @@ github "kean/Nuke" == 9.6.0
 
 ## DB
 github "realm/realm-cocoa" == 10.7.4
+
+## UI
+github "ninjaprox/NVActivityIndicatorView" == 5.1.1

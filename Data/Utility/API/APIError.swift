@@ -63,7 +63,7 @@ extension APIError {
 
 private extension URLError {
     var isConnectionError: Bool {
-        switch self.code {
+        switch code {
         case .networkConnectionLost, .notConnectedToInternet, .timedOut:
             return true
         default:

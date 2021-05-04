@@ -5,6 +5,7 @@
 //  Created by okudera on 2021/05/03.
 //
 
+import Alamofire
 import Foundation
 
 enum GitHubUsersAPIDataStoreProvider {
@@ -15,18 +16,32 @@ enum GitHubUsersAPIDataStoreProvider {
 }
 
 protocol GitHubUsersAPIDataStore {
-    func get(since: Int, completion: @escaping(Result<GitHubUsersRequest.Response, APIError<GitHubUsersRequest.ErrorResponse>>) -> Void)
+    typealias Completion = (Result<GitHubUsersRequest.Response, APIError<GitHubUsersRequest.ErrorResponse>>) -> Void
+    func getGitHubUsers(since: Int, completion: @escaping Completion)
+    func cancelRequest()
 }
 
 private final class GitHubUsersAPIDataStoreImpl: GitHubUsersAPIDataStore {
 
     var apiClient: APIClient
+    private var dataRequest: DataRequest?
 
     init(apiClient: APIClient = .shared) {
         self.apiClient = apiClient
     }
 
-    func get(since: Int, completion: @escaping(Result<GitHubUsersRequest.Response, APIError<GitHubUsersRequest.ErrorResponse>>) -> Void) {
-        apiClient.request(GitHubUsersRequest(since: since), completion: completion)
+    func getGitHubUsers(since: Int, completion: @escaping Completion) {
+        dataRequest = apiClient.request(GitHubUsersRequest(since: since)) { [weak self] result in
+            self?.dataRequest = nil
+            completion(result)
+        }
+    }
+
+    func cancelRequest() {
+        guard let dataRequest = self.dataRequest else {
+            Logger.debug("The GitHub Users API has not been requested.")
+            return
+        }
+        apiClient.cancelRequest(dataRequest)
     }
 }

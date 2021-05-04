@@ -16,7 +16,9 @@ public enum HomeUseCaseProvider {
 }
 
 public protocol HomeUseCase: AnyObject {
-    func get(since: Int, completion: @escaping(Result<HomeViewData, Error>) -> Void)
+    typealias Completion = (Result<HomeViewData, Error>) -> Void
+    func getHomeViewData(since: Int, completion: @escaping Completion)
+    func cancelHomeViewDataRequest()
 }
 
 private final class HomeUseCaseImpl: HomeUseCase {
@@ -27,14 +29,19 @@ private final class HomeUseCaseImpl: HomeUseCase {
         self.repository = repository
     }
 
-    func get(since: Int, completion: @escaping(Result<HomeViewData, Error>) -> Void) {
-        self.repository.get(since: since) { result in
-            switch result {
-            case .success(let response):
-                completion(.success(GitHubUsersTranslator.translate(response)))
+    func getHomeViewData(since: Int, completion: @escaping Completion) {
+        repository.getGitHubUsers(since: since) { result in
+            let translatedResult = result.map { GitHubUsersTranslator.translate($0) }
+            switch translatedResult {
+            case .success(let homeViewData):
+                completion(.success(homeViewData))
             case .failure(let apiError):
                 completion(.failure(apiError))
             }
         }
+    }
+
+    func cancelHomeViewDataRequest() {
+        repository.cancelRequest()
     }
 }

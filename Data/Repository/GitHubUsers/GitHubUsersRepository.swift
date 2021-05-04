@@ -17,7 +17,9 @@ public enum GitHubUsersRepositoryProvider {
 public protocol GitHubUsersRepository {
     typealias Response = [GitHubUsersResponse]
     typealias ErrorResponse = CommonErrorResponse
-    func get(since: Int, completion: @escaping(Result<Response, APIError<ErrorResponse>>) -> Void)
+    typealias Completion = (Result<Response, APIError<ErrorResponse>>) -> Void
+    func getGitHubUsers(since: Int, completion: @escaping Completion)
+    func cancelRequest()
 }
 
 private final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
@@ -28,7 +30,11 @@ private final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
         self.apiDataStore = apiDataStore
     }
 
-    func get(since: Int, completion: @escaping(Result<GitHubUsersRequest.Response, APIError<GitHubUsersRequest.ErrorResponse>>) -> Void) {
-        return apiDataStore.get(since: since, completion: completion)
+    func getGitHubUsers(since: Int, completion: @escaping Completion) {
+        return apiDataStore.getGitHubUsers(since: since, completion: completion)
+    }
+
+    func cancelRequest() {
+        apiDataStore.cancelRequest()
     }
 }

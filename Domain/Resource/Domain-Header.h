@@ -8,6 +8,7 @@
 #ifndef Domain_Header_h
 #define Domain_Header_h
 
+#import "Common-Header.h"
 #import "Data-Header.h"
 
 #endif /* Domain_Header_h */

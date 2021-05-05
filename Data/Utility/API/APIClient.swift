@@ -6,6 +6,7 @@
 //
 
 import Alamofire
+import Common
 import Foundation
 
 final class APIClient {

@@ -6,6 +6,7 @@
 //
 
 import Alamofire
+import Common
 import Foundation
 
 public enum APIError<ErrorResponse: Decodable>: Error {

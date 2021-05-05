@@ -8,6 +8,7 @@
 #ifndef Data_Header_h
 #define Data_Header_h
 
+#import "Common-Header.h"
 #import "ExceptionHandler.h"
 
 #endif /* Data_Header_h */

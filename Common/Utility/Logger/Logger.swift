@@ -1,15 +1,15 @@
 //
 //  Logger.swift
-//  Presentation
+//  Data
 //
 //  Created by okudera on 2021/03/20.
 //
 
 import Foundation
 
-enum Logger {
+public enum Logger {
 
-    static func verbose(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
+    public static func verbose(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
         #if PROD
         #else
         let now = DateFormatter.shared.string(from: Date())
@@ -18,7 +18,7 @@ enum Logger {
         #endif
     }
 
-    static func debug(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
+    public static func debug(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
         #if PROD
         #else
         let now = DateFormatter.shared.string(from: Date())
@@ -27,7 +27,7 @@ enum Logger {
         #endif
     }
 
-    static func info(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
+    public static func info(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
         #if PROD
         #else
         let now = DateFormatter.shared.string(from: Date())
@@ -36,7 +36,7 @@ enum Logger {
         #endif
     }
 
-    static func warning(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
+    public static func warning(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
         #if PROD
         #else
         let now = DateFormatter.shared.string(from: Date())
@@ -45,7 +45,7 @@ enum Logger {
         #endif
     }
 
-    static func error(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
+    public static func error(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
         #if PROD
         #else
         let now = DateFormatter.shared.string(from: Date())
@@ -54,7 +54,7 @@ enum Logger {
         #endif
     }
 
-    static func fatal(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
+    public static func fatal(_ items: Any..., file: NSString = #file, function: String = #function, line: Int = #line) {
         #if PROD
         #else
         let now = DateFormatter.shared.string(from: Date())

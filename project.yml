@@ -32,7 +32,7 @@ attributes:
 
 settingGroups:
   # Configurationによらない共通定義
-  common_app:
+  app_setting:
     PRODUCT_BUNDLE_IDENTIFIER: "jp.yuoku.MVPApp.$(BUNDLE_ID_SUFFIX)"
     SWIFT_VERSION: "5.0"
     CLANG_ENABLE_OBJC_WEAK: YES
@@ -91,7 +91,7 @@ settingGroups:
 
   ## フレームワーク
   # 共通定義
-  common_framework:
+  framework_setting:
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: "5.0"
     TARGETED_DEVICE_FAMILY: "1,2"
@@ -113,6 +113,10 @@ settingGroups:
   presentation_framework:
     PRODUCT_BUNDLE_IDENTIFIER: 'presentation$(BUNDLE_ID_SUFFIX)'
     SWIFT_OBJC_BRIDGING_HEADER: $(SRCROOT)/Presentation/Resource/Presentation-Header.h
+  # Commonフレームワーク
+  common_framework:
+    PRODUCT_BUNDLE_IDENTIFIER: 'common$(BUNDLE_ID_SUFFIX)'
+    SWIFT_OBJC_BRIDGING_HEADER: $(SRCROOT)/Common/Resource/Common-Header.h
 
 ####################
 
@@ -125,19 +129,20 @@ targets:
     settings:
       configs:
         develop-debug: # dev環境debugビルド
-          groups: [common_app, build_debug, scheme_dev, provi_dev_debug]
+          groups: [app_setting, build_debug, scheme_dev, provi_dev_debug]
         develop-release: # dev環境releaseビルド（Ad Hoc配信用）
-          groups: [common_app, build_release, scheme_dev, provi_dev_release]
+          groups: [app_setting, build_release, scheme_dev, provi_dev_release]
         production-debug: # 本番環境debugビルド
-          groups: [common_app, build_release, scheme_production, provi_production_debug]
+          groups: [app_setting, build_release, scheme_production, provi_production_debug]
         production-release: # 本番環境releaseビルド（App Storeリリース用）
-          groups: [common_app, build_release, scheme_production, provi_production_release]
+          groups: [app_setting, build_release, scheme_production, provi_production_release]
     sources:
       - path: MVPApp
         excludes:
           - "**/.gitkeep"
           - "**/*.md"
     dependencies:
+      - target: Common
       - target: Data
       - target: Domain
       - target: Presentation
@@ -180,19 +185,20 @@ targets:
     settings:
       configs:
         develop-debug: # dev環境debugビルド
-          groups: [common_framework, build_dev_framework, data_framework]
+          groups: [framework_setting, build_dev_framework, data_framework]
         develop-release: # dev環境releaseビルド（Ad Hoc配信用）
-          groups: [common_framework, build_dev_framework, data_framework]
+          groups: [framework_setting, build_dev_framework, data_framework]
         production-debug: # 本番環境debugビルド
-          groups: [common_framework, build_production_framework, data_framework]
+          groups: [framework_setting, build_production_framework, data_framework]
         production-release: # 本番環境releaseビルド（App Storeリリース用）
-          groups: [common_framework, build_production_framework, data_framework]
+          groups: [framework_setting, build_production_framework, data_framework]
     sources:
       - path: Data
         excludes:
           - "**/.gitkeep"
           - "**/*.md"
     dependencies:
+      - target: Common
       - carthage: Alamofire
       - carthage: Realm
       - carthage: RealmSwift
@@ -215,19 +221,20 @@ targets:
     settings:
       configs:
         develop-debug: # dev環境debugビルド
-          groups: [common_framework, build_dev_framework, domain_framework]
+          groups: [framework_setting, build_dev_framework, domain_framework]
         develop-release: # dev環境releaseビルド（Ad Hoc配信用）
-          groups: [common_framework, build_dev_framework, domain_framework]
+          groups: [framework_setting, build_dev_framework, domain_framework]
         production-debug: # 本番環境debugビルド
-          groups: [common_framework, build_production_framework, domain_framework]
+          groups: [framework_setting, build_production_framework, domain_framework]
         production-release: # 本番環境releaseビルド（App Storeリリース用）
-          groups: [common_framework, build_production_framework, domain_framework]
+          groups: [framework_setting, build_production_framework, domain_framework]
     sources:
       - path: Domain
         excludes:
           - "**/.gitkeep"
           - "**/*.md"
     dependencies:
+      - target: Common
       - target: Data
     info:
       path: Domain/Resource/Generated/Info.plist
@@ -248,25 +255,57 @@ targets:
     settings:
       configs:
         develop-debug: # dev環境debugビルド
-          groups: [common_framework, build_dev_framework, presentation_framework]
+          groups: [framework_setting, build_dev_framework, presentation_framework]
         develop-release: # dev環境releaseビルド（Ad Hoc配信用）
-          groups: [common_framework, build_dev_framework, presentation_framework]
+          groups: [framework_setting, build_dev_framework, presentation_framework]
         production-debug: # 本番環境debugビルド
-          groups: [common_framework, build_production_framework, presentation_framework]
+          groups: [framework_setting, build_production_framework, presentation_framework]
         production-release: # 本番環境releaseビルド（App Storeリリース用）
-          groups: [common_framework, build_production_framework, presentation_framework]
+          groups: [framework_setting, build_production_framework, presentation_framework]
     sources:
       - path: Presentation
         excludes:
           - "**/.gitkeep"
           - "**/*.md"
     dependencies:
+      - target: Common
       - target: Domain
       - carthage: Nuke
       - carthage: NVActivityIndicatorView
       - carthage: NVActivityIndicatorViewExtended
     info:
       path: Presentation/Resource/Generated/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+ ####################
+   # Commonフレームワーク
+  Common:
+    type: framework
+    platform: iOS
+    settings:
+      configs:
+        develop-debug: # dev環境debugビルド
+          groups: [framework_setting, build_dev_framework, common_framework]
+        develop-release: # dev環境releaseビルド（Ad Hoc配信用）
+          groups: [framework_setting, build_dev_framework, common_framework]
+        production-debug: # 本番環境debugビルド
+          groups: [framework_setting, build_production_framework, common_framework]
+        production-release: # 本番環境releaseビルド（App Storeリリース用）
+          groups: [framework_setting, build_production_framework, common_framework]
+    sources:
+      - path: Common
+        excludes:
+          - "**/.gitkeep"
+          - "**/*.md"
+    info:
+      path: Common/Resource/Generated/Info.plist
       properties:
         CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
         CFBundleExecutable: $(EXECUTABLE_NAME)

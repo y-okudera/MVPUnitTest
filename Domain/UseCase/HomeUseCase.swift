@@ -5,6 +5,7 @@
 //  Created by okudera on 2021/05/03.
 //
 
+import Common
 import Data
 import Foundation
 
@@ -32,6 +33,7 @@ private final class HomeUseCaseImpl: HomeUseCase {
     }
 
     func getHomeViewData(since: Int, deleteCache: Bool, completion: @escaping Completion) {
+        Logger.debug()
         repository.getGitHubUsers(since: since, refreshInterval: refreshInterval, deleteCache: deleteCache) { result in
             let translatedResult = result.map { GitHubUsersTranslator.translate($0) }
             switch translatedResult {

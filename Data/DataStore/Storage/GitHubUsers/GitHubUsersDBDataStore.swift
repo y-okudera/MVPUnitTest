@@ -5,6 +5,7 @@
 //  Created by okudera on 2021/05/04.
 //
 
+import Common
 import Foundation
 
 enum GitHubUsersDBDataStoreProvider {

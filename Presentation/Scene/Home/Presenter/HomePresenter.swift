@@ -11,8 +11,14 @@ import Foundation
 
 enum HomePresenterProvider {
 
-    static func provide(view: HomeView?, wireframe: HomeWireframe, homeUseCase: HomeUseCase) -> HomePresenter {
-        return HomePresenterImpl(view: view, wireframe: wireframe, homeUseCase: homeUseCase)
+    static func provide(view: HomeView?,
+                        wireframe: HomeWireframe,
+                        homeUseCase: HomeUseCase) -> HomePresenter {
+        return HomePresenterImpl(
+            view: view,
+            wireframe: wireframe,
+            homeUseCase: homeUseCase
+        )
     }
 }
 
@@ -32,8 +38,9 @@ final class HomePresenterImpl: HomePresenter {
 
     weak var view: HomeView?
     var viewData = HomeViewData(data: [])
-    private var wireframe: HomeWireframe
-    private var homeUseCase: HomeUseCase
+
+    private let wireframe: HomeWireframe
+    private let homeUseCase: HomeUseCase
     private var since = 0
     private var loadingState = LoadingState.none {
         didSet {
@@ -59,7 +66,7 @@ final class HomePresenterImpl: HomePresenter {
 
     func viewDidLoad() {
         resetSinceValue()
-        requestHomeViewData(loadingState: .showLoading)
+        requestHomeViewData(loadingState: .showLoading, deleteCache: false)
     }
 
     func reachedBottom() {
@@ -71,13 +78,13 @@ final class HomePresenterImpl: HomePresenter {
             Logger.debug("isLoading")
             return
         }
-        requestHomeViewData(loadingState: .showLoading)
+        requestHomeViewData(loadingState: .showLoading, deleteCache: false)
     }
 
     func pullToRefresh() {
         homeUseCase.cancelHomeViewDataRequest()
         resetSinceValue()
-        requestHomeViewData(loadingState: .showRefreshControl)
+        requestHomeViewData(loadingState: .showRefreshControl, deleteCache: true)
     }
 
     func tappedUserPageButton(urlString: String) {
@@ -132,9 +139,9 @@ extension HomePresenterImpl {
         updateSinceValue(viewData.data.last?.id ?? 0)
     }
 
-    private func requestHomeViewData(loadingState: LoadingState) {
+    private func requestHomeViewData(loadingState: LoadingState, deleteCache: Bool) {
         self.loadingState = loadingState
-        homeUseCase.getHomeViewData(since: since) { [weak self] result in
+        homeUseCase.getHomeViewData(since: since, deleteCache: deleteCache) { [weak self] result in
             switch result {
             case .success(let viewData):
                 self?.updateHomeViewData(viewData)
@@ -144,6 +151,5 @@ extension HomePresenterImpl {
             }
             self?.loadingState = .none
         }
-
     }
 }

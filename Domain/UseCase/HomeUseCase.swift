@@ -11,26 +11,28 @@ import Foundation
 public enum HomeUseCaseProvider {
 
     public static func provide() -> HomeUseCase {
-        return HomeUseCaseImpl(repository: GitHubUsersRepositoryProvider.provide())
+        return HomeUseCaseImpl(repository: GitHubUsersRepositoryProvider.provide(), refreshInterval: 60 * 30)
     }
 }
 
 public protocol HomeUseCase: AnyObject {
     typealias Completion = (Result<HomeViewData, Error>) -> Void
-    func getHomeViewData(since: Int, completion: @escaping Completion)
+    func getHomeViewData(since: Int, deleteCache: Bool, completion: @escaping Completion)
     func cancelHomeViewDataRequest()
 }
 
 private final class HomeUseCaseImpl: HomeUseCase {
 
     let repository: GitHubUsersRepository
+    let refreshInterval: TimeInterval
 
-    init(repository: GitHubUsersRepository) {
+    init(repository: GitHubUsersRepository, refreshInterval: TimeInterval) {
         self.repository = repository
+        self.refreshInterval = refreshInterval
     }
 
-    func getHomeViewData(since: Int, completion: @escaping Completion) {
-        repository.getGitHubUsers(since: since) { result in
+    func getHomeViewData(since: Int, deleteCache: Bool, completion: @escaping Completion) {
+        repository.getGitHubUsers(since: since, refreshInterval: refreshInterval, deleteCache: deleteCache) { result in
             let translatedResult = result.map { GitHubUsersTranslator.translate($0) }
             switch translatedResult {
             case .success(let homeViewData):

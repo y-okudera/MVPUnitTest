@@ -23,7 +23,7 @@ protocol GitHubUsersAPIDataStore {
 
 private final class GitHubUsersAPIDataStoreImpl: GitHubUsersAPIDataStore {
 
-    var apiClient: APIClient
+    private let apiClient: APIClient
     private var dataRequest: DataRequest?
 
     init(apiClient: APIClient = .shared) {

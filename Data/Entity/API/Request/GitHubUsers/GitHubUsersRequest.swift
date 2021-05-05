@@ -9,7 +9,7 @@ import Foundation
 
 final class GitHubUsersRequest: APIRequestable {
 
-    typealias Response = [GitHubUsersResponse]
+    typealias Response = [GitHubUserEntity]
     typealias ErrorResponse = CommonErrorResponse
 
     let baseURL = URL(string: "https://api.github.com")!

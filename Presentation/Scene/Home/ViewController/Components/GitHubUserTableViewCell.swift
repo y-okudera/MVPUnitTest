@@ -19,11 +19,6 @@ final class GitHubUserTableViewCell: UITableViewCell {
 
     private var data: GitHubUser?
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-
     override func prepareForReuse() {
         super.prepareForReuse()
         thumbnailImageView.image = nil
@@ -31,7 +26,7 @@ final class GitHubUserTableViewCell: UITableViewCell {
 
     func configure(data: GitHubUser) {
         self.data = data
-        thumbnailImageView.loadImage(with: URL(string: data.thumbnailUrl))
+        thumbnailImageView.loadImage(with: data.thumbnailUrl)
         nameLabel.text = data.name
     }
 

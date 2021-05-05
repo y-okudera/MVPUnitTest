@@ -11,26 +11,8 @@ import UIKit
 protocol TransitToHomeWireframe: AnyObject {
     var viewController: UIViewController? { get }
 
-    /*
-     *  EXAMPLE:
-     *
-     *  func presentHome()
-     *  func pushHome()
-     */
 }
 
 extension TransitToHomeWireframe {
-    /*
-     *  EXAMPLE:
-     *
-     *  func pushHome() {
-     *      let vc = HomeBuilder.build()
-     *      viewController?.navigationController?.pushViewController(vc, animated: true)
-     *  }
-     *
-     *  func presentHome() {
-     *      let vc = HomeBuilder.build()
-     *      viewController?.present(vc, animated: true)
-     *  }
-     */
+
 }

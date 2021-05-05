@@ -20,7 +20,7 @@ public struct GitHubUser {
     public let name: String
 
     /// User's thumbnail image URL.
-    public let thumbnailUrl: String
+    public let thumbnailUrl: URL?
 
     /// User page URL.
     public let htmlUrl: String

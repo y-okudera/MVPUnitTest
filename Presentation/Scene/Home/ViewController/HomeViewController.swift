@@ -45,7 +45,7 @@ final class HomeViewController: UIViewController {
         presenter.viewDidLoad()
     }
 
-    // MARK: - Selector
+    // MARK: - Selectors
 
     @objc
     private func refresh(_ sender: UIRefreshControl) {
@@ -113,7 +113,7 @@ extension HomeViewController: UITableViewDelegate {
 extension HomeViewController: UITableViewDataSourcePrefetching {
 
     func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        let urls = indexPaths.compactMap { URL(string: presenter.viewData.data[$0.row].thumbnailUrl) }
+        let urls = indexPaths.compactMap { presenter.viewData.data[$0.row].thumbnailUrl }
         ImagePrefetcher().startPrefetching(with: urls)
     }
 

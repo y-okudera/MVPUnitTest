@@ -19,6 +19,7 @@ final class RealmDaoHelper<T: RealmSwift.Object>: ExceptionCatchable {
 
     // MARK: - Create a new primary key
 
+    /// Create a new primary key like AUTO_INCREMENT.
     func newId() -> Int? {
         guard let primaryKey = T.primaryKey() else {
             Logger.error("The primary key is undefined.")
@@ -54,9 +55,9 @@ final class RealmDaoHelper<T: RealmSwift.Object>: ExceptionCatchable {
     // MARK: - Update record
 
     /// - Precondition: Valid only when `primaryKey()` is implemented in T.
-    func update(object: T, block:(() -> Void)? = nil) throws {
+    func update(object: T, block:((T) -> Void)? = nil) throws {
         let executionError = executionBlock(realm: realm) { [weak self] in
-            block?()
+            block?(object)
             self?.realm.add(object, update: .modified)
         }
         if let executionError = executionError {
@@ -120,11 +121,12 @@ final class RealmDaoHelper<T: RealmSwift.Object>: ExceptionCatchable {
 
     // MARK: - Write transaction
 
-    func transaction(block:(() throws -> Void)? = nil) throws {
+    func transaction(block: @escaping () throws -> Void, completion: (() -> Void)? = nil) throws {
         realm.beginWrite()
         do {
-            try block?()
+            try block()
             try realm.commitWrite()
+            completion?()
         } catch {
             Logger.error("transaction", error, "realm.cancelWrite()")
             realm.cancelWrite()

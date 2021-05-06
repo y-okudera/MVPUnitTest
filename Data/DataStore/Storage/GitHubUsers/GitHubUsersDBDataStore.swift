@@ -23,7 +23,7 @@ protocol GitHubUsersDBDataStore {
     func find(since: Int) -> GitHubUsersCacheEntity?
 }
 
-private final class GitHubUsersDBDataStoreImpl: GitHubUsersDBDataStore {
+final class GitHubUsersDBDataStoreImpl: GitHubUsersDBDataStore {
 
     private let usersCacheDao: RealmDaoHelper<GitHubUsersCacheEntity>
     private let userDao: RealmDaoHelper<GitHubUserEntity>

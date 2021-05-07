@@ -55,7 +55,7 @@ final class APIClient {
                 case .success(let response):
                     completion(.success(response))
                 case .failure(let afError):
-                    let apiError = APIError<T.ErrorResponse>(afError: afError, responseData: dataResponse.data)
+                    let apiError = APIError<T.ErrorResponse>(afError: afError, responseData: dataResponse.data, statusCode: dataResponse.response?.statusCode)
                     completion(.failure(apiError))
                 }
             }

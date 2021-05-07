@@ -39,10 +39,6 @@ extension APIRequestable {
         return .get
     }
 
-    var path: String {
-        return ""
-    }
-
     var parameters: [String: Any] {
         return [:]
     }

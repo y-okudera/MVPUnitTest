@@ -326,6 +326,20 @@ targets:
     sources: MVPAppTests
     dependencies:
       - target: MVPApp
+  # UnitTestターゲット
+  DataTests:
+    type: bundle.unit-test
+    platform: iOS
+    settings:
+      ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+      BUNDLE_NAME: 'Data.tests'
+      configs:
+        develop-debug:
+            VALIDATE_WORKSPACE: YES
+    sources:
+      - DataTests
+    dependencies:
+      - target: Data
 #####################
   # UITestターゲット
   MVPAppUITests:
@@ -361,6 +375,24 @@ schemeTemplates:
       config: ${debugConfig}
     archive:
       config: ${releaseConfig}
+  DataScheme:
+    build:
+      targets:
+        Data: all
+        DataTests: [test]
+    run:
+      config: ${debugConfig}
+    test:
+      config: ${debugConfig}
+      gatherCoverageData: true
+      targets:
+        - DataTests
+    profile:
+      config: ${releaseConfig}
+    analyze:
+      config: ${debugConfig}
+    archive:
+      config: ${releaseConfig}
 schemes:
   develop:
     templates: [MVPAppScheme]
@@ -372,3 +404,8 @@ schemes:
     templateAttributes:
       debugConfig: production-debug
       releaseConfig: production-release
+  Data:
+    templates: [DataScheme]
+    templateAttributes:
+      debugConfig: develop-debug
+      releaseConfig: develop-release

@@ -7,6 +7,6 @@
 
 import Foundation
 
-public struct CommonErrorResponse: Decodable {
+public struct CommonErrorResponse: Decodable, Equatable {
     // NOP
 }

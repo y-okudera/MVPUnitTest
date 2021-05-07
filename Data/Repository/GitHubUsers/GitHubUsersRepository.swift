@@ -26,7 +26,7 @@ public protocol GitHubUsersRepository {
     func cancelRequest()
 }
 
-private final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
+final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
 
     private let apiDataStore: GitHubUsersAPIDataStore
     private let dbDataStore: GitHubUsersDBDataStore

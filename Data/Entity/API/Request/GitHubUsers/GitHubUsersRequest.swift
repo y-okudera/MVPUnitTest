@@ -12,7 +12,6 @@ final class GitHubUsersRequest: APIRequestable {
     typealias Response = [GitHubUserEntity]
     typealias ErrorResponse = CommonErrorResponse
 
-    let baseURL = URL(string: "https://api.github.com")!
     let path: String = "/users"
 
     lazy var parameters: [String: Any] = {

@@ -42,33 +42,34 @@ final class GitHubUsersRepositoryTests: XCTestCase {
 
         typealias Input = (line: UInt, deleteCache: Bool, storedEntity: GitHubUsersCacheEntity, getResult: GetAPIResult)
         typealias Expect = (apiDataStoreSpyExpect: GitHubUsersAPIDataStoreSpyExpect, dbDataStoreSpyExpect: GitHubUsersDBDataStoreSpyExpect)
-        let paramTest = ParameterizedTest<Input, Expect>()
 
-        paramTest.setTestCases([
-            (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
-             expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
-                      dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
+        let paramTest = ParameterizedTest<Input, Expect>(
+            testCases: [
+                (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                 expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
+                          dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
 
-            (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .failure(.connectionError)),
-             expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
-                      dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
+                (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .failure(.connectionError)),
+                 expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
+                          dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
 
-            (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .success([.testObject, .testOtherObject])),
-             expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                      dbDataStoreSpyExpect: (addCallCount: 1, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
+                (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                 expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
+                          dbDataStoreSpyExpect: (addCallCount: 1, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
 
-            (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .failure(.connectionError)),
-             expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                      dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
+                (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .failure(.connectionError)),
+                 expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
+                          dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
 
-            (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
-             expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                      dbDataStoreSpyExpect: (addCallCount: 1, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
+                (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                 expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
+                          dbDataStoreSpyExpect: (addCallCount: 1, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
 
-            (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .failure(.connectionError)),
-             expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                      dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
-        ], expectation: expectation)
+                (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .failure(.connectionError)),
+                 expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
+                          dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
+            ],
+            expectation: expectation)
 
         paramTest.runTest { testCase in
             // Setup
@@ -95,13 +96,14 @@ final class GitHubUsersRepositoryTests: XCTestCase {
 
         typealias Input = (line: UInt, storedEntity: GitHubUsersCacheEntity, getResult: GetAPIResult)
         typealias Expect = (apiDataStoreSpyExpect: GitHubUsersAPIDataStoreSpyExpect, dbDataStoreSpyExpect: GitHubUsersDBDataStoreSpyExpect)
-        let paramTest = ParameterizedTest<Input, Expect>()
 
-        paramTest.setTestCases([
-            (input: (line: #line, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
-             expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 1),
-                      dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 0))),
-        ], expectation: expectation)
+        let paramTest = ParameterizedTest<Input, Expect>(
+            testCases: [
+                (input: (line: #line, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                 expect: (apiDataStoreSpyExpect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 1),
+                          dbDataStoreSpyExpect: (addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 0))),
+            ],
+            expectation: expectation)
 
         paramTest.runTest { testCase in
             // Setup
@@ -137,11 +139,11 @@ extension GitHubUsersRepositoryTests {
 
 final class GitHubUsersAPIDataStoreSpy: GitHubUsersAPIDataStore {
 
-    var getGitHubUsersCallCount: Int = 0
-    var cancelRequestCallCount: Int = 0
-    var getResult: GetAPIResult
+    private var getGitHubUsersCallCount: Int = 0
+    private var cancelRequestCallCount: Int = 0
+    private var getResult: GetAPIResult
 
-    var expect: GitHubUsersAPIDataStoreSpyExpect
+    private var expect: GitHubUsersAPIDataStoreSpyExpect
 
     init(getResult: GetAPIResult, expect: GitHubUsersAPIDataStoreSpyExpect) {
         self.getResult = getResult
@@ -166,13 +168,13 @@ final class GitHubUsersAPIDataStoreSpy: GitHubUsersAPIDataStore {
 
 final class GitHubUsersDBDataStoreSpy: GitHubUsersDBDataStore {
 
-    var addCallCount: Int = 0
-    var deleteCallCount: Int = 0
-    var deleteAllCallCount: Int = 0
-    var findCallCount: Int = 0
+    private var addCallCount: Int = 0
+    private var deleteCallCount: Int = 0
+    private var deleteAllCallCount: Int = 0
+    private var findCallCount: Int = 0
 
-    var storedGitHubUsersCacheEntity: GitHubUsersCacheEntity
-    var expect: GitHubUsersDBDataStoreSpyExpect
+    private var storedGitHubUsersCacheEntity: GitHubUsersCacheEntity
+    private var expect: GitHubUsersDBDataStoreSpyExpect
 
     init(storedGitHubUsersCacheEntity: GitHubUsersCacheEntity, expect: GitHubUsersDBDataStoreSpyExpect) {
         self.storedGitHubUsersCacheEntity = storedGitHubUsersCacheEntity

@@ -19,4 +19,13 @@ public final class GitHubUserEntity: RealmSwift.Object, Decodable {
     @objc public dynamic var avatarUrl: String = ""
     @objc public dynamic var htmlUrl: String = ""
     @objc public dynamic var reposUrl: String = ""
+
+    public convenience init(login: String, id: Int, avatarUrl: String, htmlUrl: String, reposUrl: String) {
+        self.init()
+        self.login = login
+        self.id = id
+        self.avatarUrl = avatarUrl
+        self.htmlUrl = htmlUrl
+        self.reposUrl = reposUrl
+    }
 }

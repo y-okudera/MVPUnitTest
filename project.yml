@@ -326,7 +326,7 @@ targets:
     sources: MVPAppTests
     dependencies:
       - target: MVPApp
-  # UnitTestターゲット
+  # Data.frameworkのUnitTestターゲット
   DataTests:
     type: bundle.unit-test
     platform: iOS
@@ -340,6 +340,20 @@ targets:
       - DataTests
     dependencies:
       - target: Data
+  # Domain.frameworkのUnitTestターゲット
+  DomainTests:
+    type: bundle.unit-test
+    platform: iOS
+    settings:
+      ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+      BUNDLE_NAME: 'Domain.tests'
+      configs:
+        develop-debug:
+            VALIDATE_WORKSPACE: YES
+    sources:
+      - DomainTests
+    dependencies:
+      - target: Domain
 #####################
   # UITestターゲット
   MVPAppUITests:
@@ -393,6 +407,24 @@ schemeTemplates:
       config: ${debugConfig}
     archive:
       config: ${releaseConfig}
+  DomainScheme:
+    build:
+      targets:
+        Domain: all
+        DomainTests: [test]
+    run:
+      config: ${debugConfig}
+    test:
+      config: ${debugConfig}
+      gatherCoverageData: true
+      targets:
+        - DomainTests
+    profile:
+      config: ${releaseConfig}
+    analyze:
+      config: ${debugConfig}
+    archive:
+      config: ${releaseConfig}
 schemes:
   develop:
     templates: [MVPAppScheme]
@@ -406,6 +438,11 @@ schemes:
       releaseConfig: production-release
   Data:
     templates: [DataScheme]
+    templateAttributes:
+      debugConfig: develop-debug
+      releaseConfig: develop-release
+  Domain:
+    templates: [DomainScheme]
     templateAttributes:
       debugConfig: develop-debug
       releaseConfig: develop-release

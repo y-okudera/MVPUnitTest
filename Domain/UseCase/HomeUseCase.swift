@@ -22,7 +22,7 @@ public protocol HomeUseCase: AnyObject {
     func cancelHomeViewDataRequest()
 }
 
-private final class HomeUseCaseImpl: HomeUseCase {
+final class HomeUseCaseImpl: HomeUseCase {
 
     let repository: GitHubUsersRepository
     let refreshInterval: TimeInterval

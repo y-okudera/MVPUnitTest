@@ -1,6 +1,6 @@
 //
 //  ParameterizedTest.swift
-//  DataTests
+//  DomainTests
 //
 //  Created by okudera on 2021/05/07.
 //

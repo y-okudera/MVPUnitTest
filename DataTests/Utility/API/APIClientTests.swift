@@ -33,15 +33,15 @@ final class APIClientTests: XCTestCase {
 
         typealias Input = (line: UInt, statusCode: Int, sleep: Int)
         typealias Expect = (code: Int, description: String)
-        let paramTest = ParameterizedTest<Input, Expect>()
 
-        paramTest.setTestCases([
-            (input: (line: #line, statusCode: 200, sleep: 0),
-             expect: (code: 200, description: "OK")),
+        let paramTest = ParameterizedTest<Input, Expect>(
+            testCases: [
+                (input: (line: #line, statusCode: 200, sleep: 0),
+                 expect: (code: 200, description: "OK")),
 
-            (input: (line: #line, statusCode: 299, sleep: 0),
-             expect: (code: 299, description: "299 Unknown Code")),
-        ], expectation: expectation)
+                (input: (line: #line, statusCode: 299, sleep: 0),
+                 expect: (code: 299, description: "299 Unknown Code")),
+            ], expectation: expectation)
 
         paramTest.runTest { testCase in
             // Setup
@@ -75,33 +75,34 @@ final class APIClientTests: XCTestCase {
 
         typealias Input = (line: UInt, statusCode: Int, sleep: Int, timeoutInterval: TimeInterval)
         typealias Expect = (APIError<DummyErrorResponse>)
-        let paramTest = ParameterizedTest<Input, Expect>()
 
-        paramTest.setTestCases([
-            (input: (line: #line, statusCode: 300, sleep: 0, timeoutInterval: 30.0),
-             expect: .errorResponse(.init(code: 300, description: "Multiple Choices"), statusCode: 300)),
+        let paramTest = ParameterizedTest<Input, Expect>(
+            testCases: [
+                (input: (line: #line, statusCode: 300, sleep: 0, timeoutInterval: 30.0),
+                 expect: .errorResponse(.init(code: 300, description: "Multiple Choices"), statusCode: 300)),
 
-            (input: (line: #line, statusCode: 399, sleep: 0, timeoutInterval: 30.0),
-             expect: .errorResponse(.init(code: 399, description: "399 Unknown Code"), statusCode: 399)),
+                (input: (line: #line, statusCode: 399, sleep: 0, timeoutInterval: 30.0),
+                 expect: .errorResponse(.init(code: 399, description: "399 Unknown Code"), statusCode: 399)),
 
-            (input: (line: #line, statusCode: 400, sleep: 0, timeoutInterval: 30.0),
-             expect: .errorResponse(.init(code: 400, description: "Bad Request"), statusCode: 400)),
+                (input: (line: #line, statusCode: 400, sleep: 0, timeoutInterval: 30.0),
+                 expect: .errorResponse(.init(code: 400, description: "Bad Request"), statusCode: 400)),
 
-            (input: (line: #line, statusCode: 499, sleep: 0, timeoutInterval: 30.0),
-             expect: .errorResponse(.init(code: 499, description: "499 Unknown Code"), statusCode: 499)),
+                (input: (line: #line, statusCode: 499, sleep: 0, timeoutInterval: 30.0),
+                 expect: .errorResponse(.init(code: 499, description: "499 Unknown Code"), statusCode: 499)),
 
-            (input: (line: #line, statusCode: 500, sleep: 0, timeoutInterval: 30.0),
-             expect: .errorResponse(.init(code: 500, description: "Internal Server Error"), statusCode: 500)),
+                (input: (line: #line, statusCode: 500, sleep: 0, timeoutInterval: 30.0),
+                 expect: .errorResponse(.init(code: 500, description: "Internal Server Error"), statusCode: 500)),
 
-            (input: (line: #line, statusCode: 599, sleep: 0, timeoutInterval: 30.0),
-             expect: .errorResponse(.init(code: 599, description: "599 Unknown Code"), statusCode: 599)),
+                (input: (line: #line, statusCode: 599, sleep: 0, timeoutInterval: 30.0),
+                 expect: .errorResponse(.init(code: 599, description: "599 Unknown Code"), statusCode: 599)),
 
-            (input: (line: #line, statusCode: 200, sleep: 6_000, timeoutInterval: 5.0),
-             expect: .connectionError),
+                (input: (line: #line, statusCode: 200, sleep: 6_000, timeoutInterval: 5.0),
+                 expect: .connectionError),
 
-            (input: (line: #line, statusCode: 0, sleep: 0, timeoutInterval: 30.0),
-             expect: .others(error: APIClientTests.invalidJSONError)),
-        ], expectation: expectation)
+                (input: (line: #line, statusCode: 0, sleep: 0, timeoutInterval: 30.0),
+                 expect: .others(error: APIClientTests.invalidJSONError)),
+            ],
+            expectation: expectation)
 
         paramTest.runTest { testCase in
             // Setup

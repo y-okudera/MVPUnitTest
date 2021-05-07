@@ -354,6 +354,20 @@ targets:
       - DomainTests
     dependencies:
       - target: Domain
+  # Presentation.frameworkのUnitTestターゲット
+  PresentationTests:
+    type: bundle.unit-test
+    platform: iOS
+    settings:
+      ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+      BUNDLE_NAME: 'Presentation.tests'
+      configs:
+        develop-debug:
+            VALIDATE_WORKSPACE: YES
+    sources:
+      - PresentationTests
+    dependencies:
+      - target: Presentation
 #####################
   # UITestターゲット
   MVPAppUITests:
@@ -425,6 +439,24 @@ schemeTemplates:
       config: ${debugConfig}
     archive:
       config: ${releaseConfig}
+  PresentationScheme:
+    build:
+      targets:
+        Presentation: all
+        PresentationTests: [test]
+    run:
+      config: ${debugConfig}
+    test:
+      config: ${debugConfig}
+      gatherCoverageData: true
+      targets:
+        - PresentationTests
+    profile:
+      config: ${releaseConfig}
+    analyze:
+      config: ${debugConfig}
+    archive:
+      config: ${releaseConfig}
 schemes:
   develop:
     templates: [MVPAppScheme]
@@ -443,6 +475,11 @@ schemes:
       releaseConfig: develop-release
   Domain:
     templates: [DomainScheme]
+    templateAttributes:
+      debugConfig: develop-debug
+      releaseConfig: develop-release
+  Presentation:
+    templates: [PresentationScheme]
     templateAttributes:
       debugConfig: develop-debug
       releaseConfig: develop-release

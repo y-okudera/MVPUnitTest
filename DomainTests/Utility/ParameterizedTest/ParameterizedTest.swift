@@ -13,7 +13,7 @@ final class ParameterizedTest<Input, Expect> {
 
     private var testCases = [TestCase]()
 
-    func setTestCases(_ testCases: [TestCase], expectation: XCTestExpectation) {
+    init(testCases: [TestCase], expectation: XCTestExpectation) {
         self.testCases = testCases
         expectation.expectedFulfillmentCount = testCases.count
     }

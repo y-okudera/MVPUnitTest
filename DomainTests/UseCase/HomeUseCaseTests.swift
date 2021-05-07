@@ -37,14 +37,15 @@ final class HomeUseCaseTests: XCTestCase {
 
         typealias Input = (line: UInt, getResult: GetAPIResult)
         typealias Expect = (GitHubUsersRepositorySpyExpect)
-        let paramTest = ParameterizedTest<Input, Expect>()
 
-        paramTest.setTestCases([
-            (input: (line: #line, getResult: .success([])),
-             expect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
-            (input: (line: #line, getResult: .failure(.connectionError)),
-             expect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
-        ], expectation: expectation)
+        let paramTest = ParameterizedTest<Input, Expect>(
+            testCases: [
+                (input: (line: #line, getResult: .success([])),
+                 expect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
+                (input: (line: #line, getResult: .failure(.connectionError)),
+                 expect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
+            ],
+            expectation: expectation)
 
         paramTest.runTest { testCase in
             // Setup
@@ -71,12 +72,13 @@ final class HomeUseCaseTests: XCTestCase {
 
         typealias Input = (UInt)
         typealias Expect = (GitHubUsersRepositorySpyExpect)
-        let paramTest = ParameterizedTest<Input, Expect>()
 
-        paramTest.setTestCases([
-            (input: (#line),
-             expect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 1)),
-        ], expectation: expectation)
+        let paramTest = ParameterizedTest<Input, Expect>(
+            testCases: [
+                (input: (#line),
+                 expect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 1)),
+            ],
+            expectation: expectation)
 
         paramTest.runTest { testCase in
             // Setup
@@ -96,11 +98,11 @@ final class HomeUseCaseTests: XCTestCase {
 
 final class GitHubUsersRepositorySpy: GitHubUsersRepository {
 
-    var getGitHubUsersCallCount: Int = 0
-    var cancelRequestCallCount: Int = 0
-    var getResult: GetAPIResult
+    private var getGitHubUsersCallCount: Int = 0
+    private var cancelRequestCallCount: Int = 0
+    private var getResult: GetAPIResult
 
-    var expect: GitHubUsersRepositorySpyExpect
+    private var expect: GitHubUsersRepositorySpyExpect
 
     init(getResult: GetAPIResult, expect: GitHubUsersRepositorySpyExpect) {
         self.getResult = getResult

@@ -31,24 +31,29 @@ final class APIClientTests: XCTestCase {
         // Expect
         let expectation = XCTestExpectation(description: "Result.success is passed to completion handler.")
 
-        typealias TestCase = (line: UInt, statusCode: Int, sleep: Int, expectCode: Int, expectDescription: String)
-        let testCases: [TestCase] = [
-            (#line, 200, 0, 200, "OK"),
-            (#line, 299, 0, 299, "299 Unknown Code"),
-        ]
-        expectation.expectedFulfillmentCount = testCases.count
+        typealias Input = (line: UInt, statusCode: Int, sleep: Int)
+        typealias Expect = (code: Int, description: String)
+        let paramTest = ParameterizedTest<Input, Expect>()
 
-        for (line, statusCode, sleep, expectCode, expectDescription) in testCases {
+        paramTest.setTestCases([
+            (input: (line: #line, statusCode: 200, sleep: 0),
+             expect: (code: 200, description: "OK")),
+
+            (input: (line: #line, statusCode: 299, sleep: 0),
+             expect: (code: 299, description: "299 Unknown Code")),
+        ], expectation: expectation)
+
+        paramTest.runTest { testCase in
             // Setup
-            let dummyRequest = DummyRequest(statusCode: statusCode, sleep: sleep)
+            let dummyRequest = DummyRequest(statusCode: testCase.input.statusCode, sleep: testCase.input.sleep)
 
             // Exercise SUT
             APIClient.shared.request(dummyRequest) { result in
                 switch result {
                 case .success(let response):
                     // Verify
-                    XCTAssertEqual(response.code, expectCode, line: line)
-                    XCTAssertEqual(response.description, expectDescription, line: line)
+                    XCTAssertEqual(response.code, testCase.expect.code, line: testCase.input.line)
+                    XCTAssertEqual(response.description, testCase.expect.description, line: testCase.input.line)
                     expectation.fulfill()
                 case .failure:
                     XCTFail("Unexpected case.")
@@ -68,23 +73,43 @@ final class APIClientTests: XCTestCase {
         // Expect
         let expectation = XCTestExpectation(description: "Result.failure is passed to completion handler.")
 
-        typealias TestCase = (line: UInt, statusCode: Int, sleep: Int, timeoutInterval: TimeInterval, expectAPIError: APIError<DummyErrorResponse>)
-        let testCases: [TestCase] = [
-            (#line, 300, 0, 30.0, .errorResponse(.init(code: 300, description: "Multiple Choices"), statusCode: 300)),
-            (#line, 399, 0, 30.0, .errorResponse(.init(code: 399, description: "399 Unknown Code"), statusCode: 399)),
-            (#line, 400, 0, 30.0, .errorResponse(.init(code: 400, description: "Bad Request"), statusCode: 400)),
-            (#line, 499, 0, 30.0, .errorResponse(.init(code: 499, description: "499 Unknown Code"), statusCode: 499)),
-            (#line, 500, 0, 30.0, .errorResponse(.init(code: 500, description: "Internal Server Error"), statusCode: 500)),
-            (#line, 599, 0, 30.0, .errorResponse(.init(code: 599, description: "599 Unknown Code"), statusCode: 599)),
-            (#line, 200, 6_000, 5.0, .connectionError),
-            (#line, 0, 0, 30.0, .others(error: APIClientTests.invalidJSONError))
-        ]
+        typealias Input = (line: UInt, statusCode: Int, sleep: Int, timeoutInterval: TimeInterval)
+        typealias Expect = (APIError<DummyErrorResponse>)
+        let paramTest = ParameterizedTest<Input, Expect>()
 
-        expectation.expectedFulfillmentCount = testCases.count
+        paramTest.setTestCases([
+            (input: (line: #line, statusCode: 300, sleep: 0, timeoutInterval: 30.0),
+             expect: .errorResponse(.init(code: 300, description: "Multiple Choices"), statusCode: 300)),
 
-        for (line, statusCode, sleep, timeoutInterval, expectAPIError) in testCases {
+            (input: (line: #line, statusCode: 399, sleep: 0, timeoutInterval: 30.0),
+             expect: .errorResponse(.init(code: 399, description: "399 Unknown Code"), statusCode: 399)),
+
+            (input: (line: #line, statusCode: 400, sleep: 0, timeoutInterval: 30.0),
+             expect: .errorResponse(.init(code: 400, description: "Bad Request"), statusCode: 400)),
+
+            (input: (line: #line, statusCode: 499, sleep: 0, timeoutInterval: 30.0),
+             expect: .errorResponse(.init(code: 499, description: "499 Unknown Code"), statusCode: 499)),
+
+            (input: (line: #line, statusCode: 500, sleep: 0, timeoutInterval: 30.0),
+             expect: .errorResponse(.init(code: 500, description: "Internal Server Error"), statusCode: 500)),
+
+            (input: (line: #line, statusCode: 599, sleep: 0, timeoutInterval: 30.0),
+             expect: .errorResponse(.init(code: 599, description: "599 Unknown Code"), statusCode: 599)),
+
+            (input: (line: #line, statusCode: 200, sleep: 6_000, timeoutInterval: 5.0),
+             expect: .connectionError),
+
+            (input: (line: #line, statusCode: 0, sleep: 0, timeoutInterval: 30.0),
+             expect: .others(error: APIClientTests.invalidJSONError)),
+        ], expectation: expectation)
+
+        paramTest.runTest { testCase in
             // Setup
-            let dummyRequest = DummyRequest(statusCode: statusCode, sleep: sleep, timeoutInterval: timeoutInterval)
+            let dummyRequest = DummyRequest(
+                statusCode: testCase.input.statusCode,
+                sleep: testCase.input.sleep,
+                timeoutInterval: testCase.input.timeoutInterval
+            )
 
             // Exercise SUT
             APIClient.shared.request(dummyRequest) { result in
@@ -93,7 +118,7 @@ final class APIClientTests: XCTestCase {
                     XCTFail("Unexpected case.")
                 case .failure(let apiError):
                     // Verify
-                    XCTAssertEqual(apiError, expectAPIError, line: line)
+                    XCTAssertEqual(apiError, testCase.expect, line: testCase.input.line)
                     expectation.fulfill()
                 }
             }

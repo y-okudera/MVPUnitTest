@@ -27,4 +27,12 @@ public struct GitHubUser {
 
     /// User's repositories page URL.
     public let reposUrl: String
+
+    public init(id: Int, name: String, thumbnailUrl: URL?, htmlUrl: String, reposUrl: String) {
+        self.id = id
+        self.name = name
+        self.thumbnailUrl = thumbnailUrl
+        self.htmlUrl = htmlUrl
+        self.reposUrl = reposUrl
+    }
 }

@@ -42,6 +42,7 @@ final class HomePresenterImpl: HomePresenter {
 
     private let wireframe: HomeWireframe
     private let homeUseCase: HomeUseCase
+
     private var since = 0
     private var loadingState = LoadingState.none {
         didSet {
@@ -71,7 +72,7 @@ final class HomePresenterImpl: HomePresenter {
     }
 
     func reachedBottom() {
-        guard viewData.data.isEmpty == false else {
+        guard !viewData.data.isEmpty else {
             Logger.debug("Initial request has not been completed.")
             return
         }
@@ -115,20 +116,21 @@ extension HomePresenterImpl {
             }
         }
     }
-}
 
-extension HomePresenterImpl {
+    func setLoadingState(_ loadingState: LoadingState) {
+        self.loadingState = loadingState
+    }
+
+    func setSinceValue(lastUserId: Int) {
+        since = lastUserId
+    }
 
     private var isInitialRequest: Bool {
         since == 0
     }
 
     private func resetSinceValue() {
-        since = 0
-    }
-
-    private func updateSinceValue(_ lastUserId: Int) {
-        since = lastUserId
+        setSinceValue(lastUserId: 0)
     }
 
     private func updateHomeViewData(_ viewData: HomeViewData) {
@@ -137,11 +139,11 @@ extension HomePresenterImpl {
         } else {
             self.viewData.data.append(contentsOf: viewData.data)
         }
-        updateSinceValue(viewData.data.last?.id ?? 0)
+        setSinceValue(lastUserId: viewData.data.last?.id ?? 0)
     }
 
     private func requestHomeViewData(loadingState: LoadingState, deleteCache: Bool) {
-        self.loadingState = loadingState
+        setLoadingState(loadingState)
         homeUseCase.getHomeViewData(since: since, deleteCache: deleteCache) { [weak self] result in
             switch result {
             case .success(let viewData):
@@ -150,7 +152,7 @@ extension HomePresenterImpl {
             case .failure(let error):
                 Logger.error("error", error)
             }
-            self?.loadingState = .none
+            self?.setLoadingState(.none)
         }
     }
 }

@@ -12,7 +12,6 @@ import XCTest
 typealias Response = [GitHubUserEntity]
 typealias ErrorResponse = CommonErrorResponse
 typealias GetAPIResult = Result<Response, APIError<CommonErrorResponse>>
-typealias GitHubUsersRepositorySpyExpect = (getGitHubUsersCallCount: Int, cancelRequestCallCount: Int)
 
 final class HomeUseCaseTests: XCTestCase {
 
@@ -20,7 +19,7 @@ final class HomeUseCaseTests: XCTestCase {
     private var useCase: HomeUseCaseImpl!
 
     override func setUpWithError() throws {
-        repositorySpy = nil
+        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
 
     override func tearDownWithError() throws {
@@ -36,14 +35,14 @@ final class HomeUseCaseTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Get GitHubUsers via the repository.")
 
         typealias Input = (line: UInt, getResult: GetAPIResult)
-        typealias Expect = (GitHubUsersRepositorySpyExpect)
+        typealias Expect = (GitHubUsersRepositorySpy.Expect)
 
         let paramTest = ParameterizedTest<Input, Expect>(
             testCases: [
                 (input: (line: #line, getResult: .success([])),
-                 expect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
+                 expect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
                 (input: (line: #line, getResult: .failure(.connectionError)),
-                 expect: (getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
+                 expect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0)),
             ],
             expectation: expectation)
 
@@ -51,6 +50,9 @@ final class HomeUseCaseTests: XCTestCase {
             // Setup
             repositorySpy = .init(getResult: testCase.input.getResult, expect: testCase.expect)
             useCase = .init(repository: repositorySpy, refreshInterval: 60 * 30)
+
+            // Reset call counts before exercise.
+            repositorySpy.resetCallCounts()
 
             // Exercise SUT
             useCase.getHomeViewData(since: 0, deleteCache: false) { [unowned self] getResult in
@@ -71,12 +73,12 @@ final class HomeUseCaseTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Cancel the HomeViewData get request.")
 
         typealias Input = (UInt)
-        typealias Expect = (GitHubUsersRepositorySpyExpect)
+        typealias Expect = (GitHubUsersRepositorySpy.Expect)
 
         let paramTest = ParameterizedTest<Input, Expect>(
             testCases: [
                 (input: (#line),
-                 expect: (getGitHubUsersCallCount: 0, cancelRequestCallCount: 1)),
+                 expect: .init(getGitHubUsersCallCount: 0, cancelRequestCallCount: 1)),
             ],
             expectation: expectation)
 
@@ -84,6 +86,9 @@ final class HomeUseCaseTests: XCTestCase {
             // Setup
             repositorySpy = .init(getResult: .failure(.connectionError), expect: testCase.expect)
             useCase = .init(repository: repositorySpy, refreshInterval: 60 * 30)
+
+            // Reset call counts before exercise.
+            repositorySpy.resetCallCounts()
 
             // Exercise SUT
             useCase.cancelHomeViewDataRequest()
@@ -98,13 +103,23 @@ final class HomeUseCaseTests: XCTestCase {
 
 final class GitHubUsersRepositorySpy: GitHubUsersRepository {
 
+    struct Expect {
+        private(set) var getGitHubUsersCallCount: Int
+        private(set) var cancelRequestCallCount: Int
+
+        init(getGitHubUsersCallCount: Int, cancelRequestCallCount: Int) {
+            self.getGitHubUsersCallCount = getGitHubUsersCallCount
+            self.cancelRequestCallCount = cancelRequestCallCount
+        }
+    }
+
     private var getGitHubUsersCallCount: Int = 0
     private var cancelRequestCallCount: Int = 0
     private var getResult: GetAPIResult
 
-    private var expect: GitHubUsersRepositorySpyExpect
+    private var expect: Expect
 
-    init(getResult: GetAPIResult, expect: GitHubUsersRepositorySpyExpect) {
+    init(getResult: GetAPIResult, expect: Expect) {
         self.getResult = getResult
         self.expect = expect
     }
@@ -116,6 +131,13 @@ final class GitHubUsersRepositorySpy: GitHubUsersRepository {
 
     func cancelRequest() {
         cancelRequestCallCount += 1
+    }
+
+    // Reset call counts
+
+    func resetCallCounts() {
+        getGitHubUsersCallCount = 0
+        cancelRequestCallCount = 0
     }
 
     // Verify

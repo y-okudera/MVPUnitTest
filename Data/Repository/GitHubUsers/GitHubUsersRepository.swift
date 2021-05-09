@@ -53,12 +53,13 @@ final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
         apiDataStore.getGitHubUsers(since: since) { [weak self] result in
             switch result {
             case .success(let response):
-                let usersCacheEntity = GitHubUsersCacheEntity(since: since, lastModified: Date(), response: response)
-                self?.dbDataStore.add(entity: usersCacheEntity, completion: nil)
+                let usersCacheEntity = GitHubUsersCacheEntity(since: since, lastModified: currentDate, response: response)
+                self?.dbDataStore.add(entity: usersCacheEntity) { _ in
+                    completion(result)
+                }
             case .failure:
-                break
+                completion(result)
             }
-            completion(result)
         }
     }
 

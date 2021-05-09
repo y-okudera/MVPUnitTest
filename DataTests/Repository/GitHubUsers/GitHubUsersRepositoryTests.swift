@@ -9,6 +9,7 @@
 import XCTest
 
 typealias GetAPIResult = Result<GitHubUsersRequest.Response, APIError<GitHubUsersRequest.ErrorResponse>>
+let AddToDBIsCompletion = Notification.Name("AddToDBIsCompletion")
 
 final class GitHubUsersRepositoryTests: XCTestCase {
 
@@ -45,28 +46,28 @@ final class GitHubUsersRepositoryTests: XCTestCase {
         let paramTest = ParameterizedTest<Input, Expect>(
             testCases: [
                 (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .success(successApiResponse)),
-                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
-                          dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
+                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersArgs: [], cancelRequestArgs: []),
+                          dbDataStoreSpyExpect: .init(addArgs: [], deleteArgs: [], deleteAllArgs: [], findArgs: [since]))),
 
                 (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .failure(apiError)),
-                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
-                          dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
+                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersArgs: [], cancelRequestArgs: []),
+                          dbDataStoreSpyExpect: .init(addArgs: [], deleteArgs: [], deleteAllArgs: [], findArgs: [since]))),
 
                 (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .success(successApiResponse)),
-                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                          dbDataStoreSpyExpect: .init(addCallCount: 1, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
+                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersArgs: [since], cancelRequestArgs: []),
+                          dbDataStoreSpyExpect: .init(addArgs: [cacheEntity], deleteArgs: [since], deleteAllArgs: [], findArgs: [since]))),
 
                 (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .failure(apiError)),
-                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                          dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
+                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersArgs: [since], cancelRequestArgs: []),
+                          dbDataStoreSpyExpect: .init(addArgs: [], deleteArgs: [since], deleteAllArgs: [], findArgs: [since]))),
 
                 (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .success(successApiResponse)),
-                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                          dbDataStoreSpyExpect: .init(addCallCount: 1, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
+                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersArgs: [since], cancelRequestArgs: []),
+                          dbDataStoreSpyExpect: .init(addArgs: [cacheEntity], deleteArgs: [], deleteAllArgs: [()], findArgs: []))),
 
                 (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .failure(apiError)),
-                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
-                          dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
+                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersArgs: [since], cancelRequestArgs: []),
+                          dbDataStoreSpyExpect: .init(addArgs: [], deleteArgs: [], deleteAllArgs: [()], findArgs: []))),
             ],
             expectation: expectation)
 
@@ -82,13 +83,24 @@ final class GitHubUsersRepositoryTests: XCTestCase {
 
             // Exercise SUT
             repository.getGitHubUsers(since: 0, currentDate: currentDate, refreshInterval: refreshInterval, deleteCache: testCase.input.deleteCache) { [unowned self] _ in
-                // Verify
-                apiDataStoreSpy.verify(line: testCase.input.line)
-                dbDataStoreSpy.verify(line: testCase.input.line)
-                expectation.fulfill()
+
+                if testCase.expect.dbDataStoreSpyExpect.addArgs.isEmpty {
+                    // Verify
+                    apiDataStoreSpy.verify(line: testCase.input.line)
+                    dbDataStoreSpy.verify(line: testCase.input.line)
+                    expectation.fulfill()
+                } else {
+                    // The DBDataStore Spy will notify when the object has been added to the database.
+                    NotificationCenter.default.addObserver(forName: AddToDBIsCompletion, object: nil, queue: .main) { _ in
+                        // Verify
+                        apiDataStoreSpy.verify(line: testCase.input.line)
+                        dbDataStoreSpy.verifyIfAdded(line: testCase.input.line)
+                        expectation.fulfill()
+                    }
+                }
             }
         }
-        wait(for: [expectation], timeout: 6.0)
+        wait(for: [expectation], timeout: 4.0)
     }
 
     /// Cancelled api request test.
@@ -105,8 +117,8 @@ final class GitHubUsersRepositoryTests: XCTestCase {
         let paramTest = ParameterizedTest<Input, Expect>(
             testCases: [
                 (input: (line: #line, storedEntity: invalidCacheEntity, getResult: .success(successApiResponse)),
-                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 0, cancelRequestCallCount: 1),
-                          dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 0))),
+                 expect: (apiDataStoreSpyExpect: .init(getGitHubUsersArgs: [], cancelRequestArgs: [()]),
+                          dbDataStoreSpyExpect: .init(addArgs: [], deleteArgs: [], deleteAllArgs: [], findArgs: []))),
             ],
             expectation: expectation)
 
@@ -131,6 +143,10 @@ final class GitHubUsersRepositoryTests: XCTestCase {
 }
 
 extension GitHubUsersRepositoryTests {
+
+    private var since: Int {
+        0
+    }
 
     private var currentDate: Date {
         Date.now(dateGenerator: { DateGenerator.generate(dateString: "20210509120000") })
@@ -157,6 +173,10 @@ extension GitHubUsersRepositoryTests {
     private var apiError: APIError<GitHubUsersRequest.ErrorResponse> {
         .connectionError
     }
+
+    private var cacheEntity: GitHubUsersCacheEntity {
+        .init(since: since, lastModified: currentDate, response: successApiResponse)
+    }
 }
 
 // MARK: - Spy
@@ -164,17 +184,17 @@ extension GitHubUsersRepositoryTests {
 final class GitHubUsersAPIDataStoreSpy: GitHubUsersAPIDataStore {
 
     struct Expect {
-        private(set) var getGitHubUsersCallCount: Int
-        private(set) var cancelRequestCallCount: Int
+        private(set) var getGitHubUsersArgs: [Int]
+        private(set) var cancelRequestArgs: [Void]
 
-        init(getGitHubUsersCallCount: Int, cancelRequestCallCount: Int) {
-            self.getGitHubUsersCallCount = getGitHubUsersCallCount
-            self.cancelRequestCallCount = cancelRequestCallCount
+        init(getGitHubUsersArgs: [Int], cancelRequestArgs: [Void]) {
+            self.getGitHubUsersArgs = getGitHubUsersArgs
+            self.cancelRequestArgs = cancelRequestArgs
         }
     }
 
-    private var getGitHubUsersCallCount: Int = 0
-    private var cancelRequestCallCount: Int = 0
+    private var getGitHubUsersArgs: [Int] = []
+    private var cancelRequestArgs: [Void] = []
     private var getResult: GetAPIResult
 
     private var expect: Expect
@@ -185,48 +205,48 @@ final class GitHubUsersAPIDataStoreSpy: GitHubUsersAPIDataStore {
     }
 
     func getGitHubUsers(since: Int, completion: @escaping Completion) {
-        getGitHubUsersCallCount += 1
+        getGitHubUsersArgs.append(since)
         completion(getResult)
     }
 
     func cancelRequest() {
-        cancelRequestCallCount += 1
+        cancelRequestArgs.append(())
     }
 
     // Reset call counts
 
     func resetCallCounts() {
-        getGitHubUsersCallCount = 0
-        cancelRequestCallCount = 0
+        getGitHubUsersArgs = []
+        cancelRequestArgs = []
     }
 
     // Verify
     func verify(line: UInt) {
-        XCTAssertEqual(getGitHubUsersCallCount, expect.getGitHubUsersCallCount, "getGitHubUsersCallCount", line: line)
-        XCTAssertEqual(cancelRequestCallCount, expect.cancelRequestCallCount, "cancelRequestCallCount", line: line)
+        XCTAssertEqual(getGitHubUsersArgs, expect.getGitHubUsersArgs, "getGitHubUsersArgs", line: line)
+        XCTAssertEqual(cancelRequestArgs.count, expect.cancelRequestArgs.count, "cancelRequestArgs", line: line)
     }
 }
 
 final class GitHubUsersDBDataStoreSpy: GitHubUsersDBDataStore {
 
     struct Expect {
-        private(set) var addCallCount: Int
-        private(set) var deleteCallCount: Int
-        private(set) var deleteAllCallCount: Int
-        private(set) var findCallCount: Int
+        private(set) var addArgs: [GitHubUsersCacheEntity]
+        private(set) var deleteArgs: [Int]
+        private(set) var deleteAllArgs: [Void]
+        private(set) var findArgs: [Int]
 
-        init(addCallCount: Int, deleteCallCount: Int, deleteAllCallCount: Int, findCallCount: Int) {
-            self.addCallCount = addCallCount
-            self.deleteCallCount = deleteCallCount
-            self.deleteAllCallCount = deleteAllCallCount
-            self.findCallCount = findCallCount
+        init(addArgs: [GitHubUsersCacheEntity], deleteArgs: [Int], deleteAllArgs: [Void], findArgs: [Int]) {
+            self.addArgs = addArgs
+            self.deleteArgs = deleteArgs
+            self.deleteAllArgs = deleteAllArgs
+            self.findArgs = findArgs
         }
     }
 
-    private var addCallCount: Int = 0
-    private var deleteCallCount: Int = 0
-    private var deleteAllCallCount: Int = 0
-    private var findCallCount: Int = 0
+    private var addArgs: [GitHubUsersCacheEntity] = []
+    private var deleteArgs: [Int] = []
+    private var deleteAllArgs: [Void] = []
+    private var findArgs: [Int] = []
 
     private var storedGitHubUsersCacheEntity: GitHubUsersCacheEntity
     private var expect: Expect
@@ -237,36 +257,55 @@ final class GitHubUsersDBDataStoreSpy: GitHubUsersDBDataStore {
     }
 
     func add(entity: GitHubUsersCacheEntity, completion: Completion?) {
-        addCallCount += 1
+        addArgs.append(entity)
+        completion?(.success(()))
+        NotificationCenter.default.post(name: AddToDBIsCompletion, object: nil)
     }
 
     func delete(since: Int, completion: Completion?) {
-        deleteCallCount += 1
+        deleteArgs.append(since)
+        completion?(.success(()))
     }
 
     func deleteAll(completion: Completion?) {
-        deleteAllCallCount += 1
+        deleteAllArgs.append(())
+        completion?(.success(()))
     }
 
     func find(since: Int) -> GitHubUsersCacheEntity? {
-        findCallCount += 1
+        findArgs.append(since)
         return storedGitHubUsersCacheEntity
     }
 
     // Reset call counts
 
     func resetCallCounts() {
-        addCallCount = 0
-        deleteCallCount = 0
-        deleteAllCallCount = 0
-        findCallCount = 0
+        addArgs = []
+        deleteArgs = []
+        deleteAllArgs = []
+        findArgs = []
     }
 
     // Verify
     func verify(line: UInt) {
-        XCTAssertEqual(addCallCount, expect.addCallCount, "addCallCount", line: line)
-        XCTAssertEqual(deleteCallCount, expect.deleteCallCount, "deleteCallCount", line: line)
-        XCTAssertEqual(deleteAllCallCount, expect.deleteAllCallCount, "deleteAllCallCount", line: line)
-        XCTAssertEqual(findCallCount, expect.findCallCount, "findCallCount", line: line)
+        XCTAssertEqual(addArgs, expect.addArgs, "addArgs", line: line)
+        XCTAssertEqual(deleteArgs, expect.deleteArgs, "deleteArgs", line: line)
+        XCTAssertEqual(deleteAllArgs.count, expect.deleteAllArgs.count, "deleteAllArgs", line: line)
+        XCTAssertEqual(findArgs, expect.findArgs, "findArgs", line: line)
+    }
+
+    func verifyIfAdded(line: UInt) {
+        XCTAssertEqual(addArgs.count, expect.addArgs.count, "addArgs.count", line: line)
+        XCTAssertEqual(addArgs[0].since, expect.addArgs[0].since, "addArgs[0].since", line: line)
+        XCTAssertEqual(addArgs[0].lastModified, expect.addArgs[0].lastModified, "addArgs[0].lastModified", line: line)
+
+        let responseList = Array(addArgs[0].responseList)
+        let expectResponseList = Array(expect.addArgs[0].responseList)
+        XCTAssertEqual(responseList[0].id, expectResponseList[0].id, "responseList[0].id", line: line)
+        XCTAssertEqual(responseList[1].id, expectResponseList[1].id, "responseList[1].id", line: line)
+
+        XCTAssertEqual(deleteArgs, expect.deleteArgs, "deleteArgs", line: line)
+        XCTAssertEqual(deleteAllArgs.count, expect.deleteAllArgs.count, "deleteAllArgs", line: line)
+        XCTAssertEqual(findArgs, expect.findArgs, "findArgs", line: line)
     }
 }

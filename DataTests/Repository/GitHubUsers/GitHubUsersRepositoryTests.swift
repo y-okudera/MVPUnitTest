@@ -36,32 +36,35 @@ final class GitHubUsersRepositoryTests: XCTestCase {
         let description = "If there is a valid cache, get it from the cache, if not, request to server. If the deleteCache flag is true, delete the cache and then request to server."
         let expectation = XCTestExpectation(description: description)
 
+        // deleteCache: It is the input parameter for the function under test.
+        // storedEntity: It is the result read from the dependent Database.
+        // getResult: It is the processing result of the dependent API.
         typealias Input = (line: UInt, deleteCache: Bool, storedEntity: GitHubUsersCacheEntity, getResult: GetAPIResult)
         typealias Expect = (apiDataStoreSpyExpect: GitHubUsersAPIDataStoreSpy.Expect, dbDataStoreSpyExpect: GitHubUsersDBDataStoreSpy.Expect)
 
         let paramTest = ParameterizedTest<Input, Expect>(
             testCases: [
-                (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .success(successApiResponse)),
                  expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
                           dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
 
-                (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .failure(.connectionError)),
+                (input: (line: #line, deleteCache: false, storedEntity: validCacheEntity, getResult: .failure(apiError)),
                  expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 0, cancelRequestCallCount: 0),
                           dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 1))),
 
-                (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .success(successApiResponse)),
                  expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
                           dbDataStoreSpyExpect: .init(addCallCount: 1, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
 
-                (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .failure(.connectionError)),
+                (input: (line: #line, deleteCache: false, storedEntity: invalidCacheEntity, getResult: .failure(apiError)),
                  expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
                           dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 1, deleteAllCallCount: 0, findCallCount: 1))),
 
-                (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .success(successApiResponse)),
                  expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
                           dbDataStoreSpyExpect: .init(addCallCount: 1, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
 
-                (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .failure(.connectionError)),
+                (input: (line: #line, deleteCache: true, storedEntity: validCacheEntity, getResult: .failure(apiError)),
                  expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 1, cancelRequestCallCount: 0),
                           dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 1, findCallCount: 0))),
             ],
@@ -78,7 +81,7 @@ final class GitHubUsersRepositoryTests: XCTestCase {
             dbDataStoreSpy.resetCallCounts()
 
             // Exercise SUT
-            repository.getGitHubUsers(since: 0, refreshInterval: defaultRefreshInterval, deleteCache: testCase.input.deleteCache) { [unowned self] getResult in
+            repository.getGitHubUsers(since: 0, currentDate: currentDate, refreshInterval: refreshInterval, deleteCache: testCase.input.deleteCache) { [unowned self] _ in
                 // Verify
                 apiDataStoreSpy.verify(line: testCase.input.line)
                 dbDataStoreSpy.verify(line: testCase.input.line)
@@ -94,12 +97,14 @@ final class GitHubUsersRepositoryTests: XCTestCase {
         // Expect
         let expectation = XCTestExpectation(description: "Cancelled api request.")
 
+        // storedEntity: It is the result read from the dependent Database.
+        // getResult: It is the processing result of the dependent API.
         typealias Input = (line: UInt, storedEntity: GitHubUsersCacheEntity, getResult: GetAPIResult)
         typealias Expect = (apiDataStoreSpyExpect: GitHubUsersAPIDataStoreSpy.Expect, dbDataStoreSpyExpect: GitHubUsersDBDataStoreSpy.Expect)
 
         let paramTest = ParameterizedTest<Input, Expect>(
             testCases: [
-                (input: (line: #line, storedEntity: validCacheEntity, getResult: .success([.testObject, .testOtherObject])),
+                (input: (line: #line, storedEntity: invalidCacheEntity, getResult: .success(successApiResponse)),
                  expect: (apiDataStoreSpyExpect: .init(getGitHubUsersCallCount: 0, cancelRequestCallCount: 1),
                           dbDataStoreSpyExpect: .init(addCallCount: 0, deleteCallCount: 0, deleteAllCallCount: 0, findCallCount: 0))),
             ],
@@ -126,16 +131,31 @@ final class GitHubUsersRepositoryTests: XCTestCase {
 }
 
 extension GitHubUsersRepositoryTests {
-    var defaultRefreshInterval: TimeInterval {
+
+    private var currentDate: Date {
+        Date.now(dateGenerator: { DateGenerator.generate(dateString: "20210509120000") })
+    }
+
+    private var refreshInterval: TimeInterval {
         60 * 30
     }
 
-    var validCacheEntity: GitHubUsersCacheEntity {
-        .init(since: 0, lastModified: Date(timeIntervalSinceNow: -defaultRefreshInterval + 1), response: [.testObject])
+    private var validCacheEntity: GitHubUsersCacheEntity {
+        let lastModified = Date(timeInterval: -refreshInterval + 1, since: currentDate)
+        return GitHubUsersCacheEntity(since: 0, lastModified: lastModified, response: [.testObject])
     }
 
-    var invalidCacheEntity: GitHubUsersCacheEntity {
-        .init(since: 0, lastModified: Date(timeIntervalSinceNow: -defaultRefreshInterval - 1), response: [.testObject])
+    private var invalidCacheEntity: GitHubUsersCacheEntity {
+        let lastModified = Date(timeInterval: -refreshInterval - 1, since: currentDate)
+        return GitHubUsersCacheEntity(since: 0, lastModified: lastModified, response: [.testObject])
+    }
+
+    private var successApiResponse: GitHubUsersRequest.Response {
+        [.testObject, .testOtherObject]
+    }
+
+    private var apiError: APIError<GitHubUsersRequest.ErrorResponse> {
+        .connectionError
     }
 }
 

@@ -1,15 +1,17 @@
 //
 //  DateGenerator.swift
-//  DataTests
+//  Common
 //
 //  Created by okudera on 2021/05/09.
 //
 
 import Foundation
 
-enum DateGenerator {
+public enum DateGenerator {
 
-    static func generate(dateString: String, dateFormat: String = "yyyyMMddHHmmss", timeZone: TimeZone! = TimeZone(identifier: "Asia/Tokyo")) -> Date {
+    public static func generate(dateString: String,
+                                dateFormat: String = "yyyyMMddHHmmss",
+                                timeZone: TimeZone! = TimeZone(identifier: "Asia/Tokyo")) -> Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = dateFormat
 

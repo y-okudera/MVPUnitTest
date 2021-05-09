@@ -422,7 +422,7 @@ final class HomeUseCaseSpy: HomeUseCase {
         self.expect = expect
     }
 
-    func getHomeViewData(since: Int, deleteCache: Bool, completion: @escaping Completion) {
+    func getHomeViewData(since: Int, currentDate: Date, deleteCache: Bool, completion: @escaping Completion) {
         getHomeViewDataCallCount += 1
         completion(self.getHomeViewDataResult)
     }

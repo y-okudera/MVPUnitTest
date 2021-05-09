@@ -36,7 +36,7 @@ final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
         self.dbDataStore = dbDataStore
     }
 
-    func getGitHubUsers(since: Int, currentDate: Date = .now(), refreshInterval: TimeInterval, deleteCache: Bool, completion: @escaping Completion) {
+    func getGitHubUsers(since: Int, currentDate: Date, refreshInterval: TimeInterval, deleteCache: Bool, completion: @escaping Completion) {
 
         if deleteCache {
             dbDataStore.deleteAll(completion: nil)

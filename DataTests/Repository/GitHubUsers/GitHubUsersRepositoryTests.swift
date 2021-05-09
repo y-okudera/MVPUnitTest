@@ -6,6 +6,7 @@
 //
 
 @testable import Data
+import Common
 import XCTest
 
 typealias GetAPIResult = Result<GitHubUsersRequest.Response, APIError<GitHubUsersRequest.ErrorResponse>>

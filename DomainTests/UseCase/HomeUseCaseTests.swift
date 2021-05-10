@@ -56,7 +56,7 @@ final class HomeUseCaseTests: XCTestCase {
             repositorySpy.resetCallCounts()
 
             // Exercise SUT
-            useCase.getHomeViewData(since: since, currentDate: currentDate, deleteCache: deleteCache) { [unowned self] getResult in
+            useCase.getHomeViewData(since: since, currentDate: currentDate, deleteCache: deleteCache) { [unowned self] _ in
                 // Verify
                 repositorySpy.verify(line: testCase.input.line)
                 expectation.fulfill()
@@ -66,7 +66,7 @@ final class HomeUseCaseTests: XCTestCase {
     }
 
     // MARK: - func cancelHomeViewDataRequest() tests
-    
+
     /// Test to cancel the HomeViewData get request.
     func testCancelHomeViewDataRequest() {
 

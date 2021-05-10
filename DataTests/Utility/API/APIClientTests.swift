@@ -160,7 +160,7 @@ final class APIClientTests: XCTestCase {
     }
 
     // MARK: - func cancelAllRequests() tests
-    
+
     /// Cancel all API requests test.
     ///
     /// Expectation: Result.failure is passed to completion handler.

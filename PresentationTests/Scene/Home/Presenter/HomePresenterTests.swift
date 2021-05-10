@@ -81,7 +81,7 @@ final class HomePresenterTests: XCTestCase {
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { _ in
             presenter.viewDidLoad()
         }
         wait(for: [expectation], timeout: 3.0)
@@ -161,7 +161,7 @@ final class HomePresenterTests: XCTestCase {
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { _ in
             presenter.reachedBottom()
         }
         wait(for: [expectation], timeout: 3.0)
@@ -210,7 +210,7 @@ final class HomePresenterTests: XCTestCase {
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { _ in
             presenter.pullToRefresh()
         }
         wait(for: [expectation], timeout: 3.0)
@@ -241,7 +241,7 @@ final class HomePresenterTests: XCTestCase {
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { testCase in
             presenter.tappedUserPageButton(urlString: testCase.input.htmlUrl)
         }
         wait(for: [expectation], timeout: 3.0)

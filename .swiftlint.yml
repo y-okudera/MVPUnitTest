@@ -22,8 +22,10 @@ excluded:
   - Carthage/
   - vendor/
   - ./**/Generated/
-  - ComicChatTests/
   - ComicChatUITests/
+  - DataTests/
+  - DomainTests/
+  - PresentationTests/
 
 # 1行あたりの文字数制限を200に変更
 line_length: 200

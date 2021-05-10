@@ -55,7 +55,7 @@ final class RealmDaoHelper<T: RealmSwift.Object>: ExceptionCatchable {
     // MARK: - Update record
 
     /// - Precondition: Valid only when `primaryKey()` is implemented in T.
-    func update(object: T, block:((T) -> Void)? = nil) throws {
+    func update(object: T, block: ((T) -> Void)? = nil) throws {
         let executionError = executionBlock(realm: realm) { [weak self] in
             block?(object)
             self?.realm.add(object, update: .modified)

@@ -17,7 +17,7 @@ final class GitHubUsersDBDataStoreTests: XCTestCase {
     private var userDao: RealmDaoHelper<GitHubUserEntity>!
 
     typealias DBCompletion = (Result<Void, Error>) -> Void
-    
+
     override func setUpWithError() throws {
         let inMemoryRealm = try! Realm(configuration: inMemoryRealmInitializer.configuration!)
         usersCacheDao = .init(realm: inMemoryRealm)

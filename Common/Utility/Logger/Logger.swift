@@ -1,6 +1,6 @@
 //
 //  Logger.swift
-//  Data
+//  Common
 //
 //  Created by okudera on 2021/03/20.
 //

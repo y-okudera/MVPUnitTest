@@ -142,9 +142,9 @@ extension HomePresenterImpl {
         setSinceValue(lastUserId: viewData.data.last?.id ?? 0)
     }
 
-    private func requestHomeViewData(loadingState: LoadingState, deleteCache: Bool) {
+    private func requestHomeViewData(loadingState: LoadingState, currentDate: Date = .now(), deleteCache: Bool) {
         setLoadingState(loadingState)
-        homeUseCase.getHomeViewData(since: since, deleteCache: deleteCache) { [weak self] result in
+        homeUseCase.getHomeViewData(since: since, currentDate: currentDate, deleteCache: deleteCache) { [weak self] result in
             switch result {
             case .success(let viewData):
                 self?.updateHomeViewData(viewData)

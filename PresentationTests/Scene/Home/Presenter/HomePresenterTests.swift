@@ -56,13 +56,13 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .none,
                      htmlUrl: "",
                      getHomeViewDataResult: .success(HomeViewData(data: []))),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 1,
-                                               hideLoadingViewCallCount: 1,
-                                               showRefreshControlCallCount: 0,
-                                               hideRefreshControlCallCount: 2,
-                                               reloadDataCallCount: 1),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 1, cancelHomeViewDataRequestCallCount: 0))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [()],
+                                               hideLoadingViewArgs: [()],
+                                               showRefreshControlArgs: [],
+                                               hideRefreshControlArgs: [(), ()],
+                                               reloadDataArgs: [()]),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [(since: 0, currentDate: currentDate, deleteCache: false)], cancelHomeViewDataRequestArgs: []))
             ),
 
             (input: (line: #line,
@@ -71,17 +71,17 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .none,
                      htmlUrl: "",
                      getHomeViewDataResult: .failure(HomePresenterTests.notConnectedToInternetError)),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 1,
-                                               hideLoadingViewCallCount: 1,
-                                               showRefreshControlCallCount: 0,
-                                               hideRefreshControlCallCount: 2,
-                                               reloadDataCallCount: 0),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 1, cancelHomeViewDataRequestCallCount: 0))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [()],
+                                               hideLoadingViewArgs: [()],
+                                               showRefreshControlArgs: [],
+                                               hideRefreshControlArgs: [(), ()],
+                                               reloadDataArgs: []),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [(since: 0, currentDate: currentDate, deleteCache: false)], cancelHomeViewDataRequestArgs: []))
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { _ in
             presenter.viewDidLoad()
         }
         wait(for: [expectation], timeout: 3.0)
@@ -102,13 +102,13 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .none,
                      htmlUrl: "",
                      getHomeViewDataResult: .success(HomeViewData(data: []))),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 0,
-                                               hideLoadingViewCallCount: 0,
-                                               showRefreshControlCallCount: 0,
-                                               hideRefreshControlCallCount: 0,
-                                               reloadDataCallCount: 0),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 0, cancelHomeViewDataRequestCallCount: 0))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [],
+                                               hideLoadingViewArgs: [],
+                                               showRefreshControlArgs: [],
+                                               hideRefreshControlArgs: [],
+                                               reloadDataArgs: []),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [], cancelHomeViewDataRequestArgs: []))
             ),
 
             // Presenter has ViewData. And the LoadingState is 'showLoading'.
@@ -118,13 +118,13 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .showLoading,
                      htmlUrl: "",
                      getHomeViewDataResult: .success(HomeViewData(data: [.testOtherObject]))),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 0,
-                                               hideLoadingViewCallCount: 0,
-                                               showRefreshControlCallCount: 0,
-                                               hideRefreshControlCallCount: 0,
-                                               reloadDataCallCount: 0),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 0, cancelHomeViewDataRequestCallCount: 0))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [],
+                                               hideLoadingViewArgs: [],
+                                               showRefreshControlArgs: [],
+                                               hideRefreshControlArgs: [],
+                                               reloadDataArgs: []),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [], cancelHomeViewDataRequestArgs: []))
             ),
 
             // Presenter has ViewData. And the LoadingState is 'showRefreshControl'.
@@ -134,13 +134,13 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .showRefreshControl,
                      htmlUrl: "",
                      getHomeViewDataResult: .success(HomeViewData(data: [.testOtherObject]))),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 0,
-                                               hideLoadingViewCallCount: 0,
-                                               showRefreshControlCallCount: 0,
-                                               hideRefreshControlCallCount: 0,
-                                               reloadDataCallCount: 0),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 0, cancelHomeViewDataRequestCallCount: 0))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [],
+                                               hideLoadingViewArgs: [],
+                                               showRefreshControlArgs: [],
+                                               hideRefreshControlArgs: [],
+                                               reloadDataArgs: []),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [], cancelHomeViewDataRequestArgs: []))
             ),
 
             // Presenter has ViewData. And the LoadingState is 'none'.
@@ -151,17 +151,17 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .none,
                      htmlUrl: "",
                      getHomeViewDataResult: .success(HomeViewData(data: [.testOtherObject]))),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 1,
-                                               hideLoadingViewCallCount: 1,
-                                               showRefreshControlCallCount: 0,
-                                               hideRefreshControlCallCount: 2,
-                                               reloadDataCallCount: 1),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 1, cancelHomeViewDataRequestCallCount: 0))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [()],
+                                               hideLoadingViewArgs: [()],
+                                               showRefreshControlArgs: [],
+                                               hideRefreshControlArgs: [(), ()],
+                                               reloadDataArgs: [()]),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [(since: 100, currentDate: currentDate, deleteCache: false)], cancelHomeViewDataRequestArgs: []))
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { _ in
             presenter.reachedBottom()
         }
         wait(for: [expectation], timeout: 3.0)
@@ -183,13 +183,13 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .none,
                      htmlUrl: "",
                      getHomeViewDataResult: .success(HomeViewData(data: [.testOtherObject]))),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 0,
-                                               hideLoadingViewCallCount: 2,
-                                               showRefreshControlCallCount: 1,
-                                               hideRefreshControlCallCount: 1,
-                                               reloadDataCallCount: 1),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 1, cancelHomeViewDataRequestCallCount: 1))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [],
+                                               hideLoadingViewArgs: [(), ()],
+                                               showRefreshControlArgs: [()],
+                                               hideRefreshControlArgs: [()],
+                                               reloadDataArgs: [()]),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [(since: 0, currentDate: currentDate, deleteCache: true)], cancelHomeViewDataRequestArgs: [()]))
             ),
 
             // The request failed.
@@ -200,17 +200,17 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .none,
                      htmlUrl: "",
                      getHomeViewDataResult: .failure(HomePresenterTests.notConnectedToInternetError)),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 0,
-                                               hideLoadingViewCallCount: 2,
-                                               showRefreshControlCallCount: 1,
-                                               hideRefreshControlCallCount: 1,
-                                               reloadDataCallCount: 0),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 0),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 1, cancelHomeViewDataRequestCallCount: 1))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [],
+                                               hideLoadingViewArgs: [(), ()],
+                                               showRefreshControlArgs: [()],
+                                               hideRefreshControlArgs: [()],
+                                               reloadDataArgs: []),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: []),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [(since: 0, currentDate: currentDate, deleteCache: true)], cancelHomeViewDataRequestArgs: [()]))
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { _ in
             presenter.pullToRefresh()
         }
         wait(for: [expectation], timeout: 3.0)
@@ -231,17 +231,17 @@ final class HomePresenterTests: XCTestCase {
                      loadingState: .none,
                      htmlUrl: GitHubUser.testUser.htmlUrl,
                      getHomeViewDataResult: .success(HomeViewData(data: []))),
-             expect: (homeViewSpyExpect: .init(showLoadingViewCallCount: 0,
-                                               hideLoadingViewCallCount: 0,
-                                               showRefreshControlCallCount: 0,
-                                               hideRefreshControlCallCount: 0,
-                                               reloadDataCallCount: 0),
-                      homeWireframeSpyExpect: .init(openExternalBrowserCallCount: 1),
-                      homeUseCaseSpyExpect: .init(getHomeViewDataCallCount: 0, cancelHomeViewDataRequestCallCount: 0))
+             expect: (homeViewSpyExpect: .init(showLoadingViewArgs: [],
+                                               hideLoadingViewArgs: [],
+                                               showRefreshControlArgs: [],
+                                               hideRefreshControlArgs: [],
+                                               reloadDataArgs: []),
+                      homeWireframeSpyExpect: .init(openExternalBrowserArgs: [GitHubUser.testUser.htmlUrl]),
+                      homeUseCaseSpyExpect: .init(getHomeViewDataArgs: [], cancelHomeViewDataRequestArgs: []))
             ),
         ]
 
-        parameterizedTest(testCases: testCases, expectation: expectation) { (testCase) in
+        parameterizedTest(testCases: testCases, expectation: expectation) { testCase in
             presenter.tappedUserPageButton(urlString: testCase.input.htmlUrl)
         }
         wait(for: [expectation], timeout: 3.0)
@@ -252,6 +252,10 @@ extension HomePresenterTests {
 
     private static var notConnectedToInternetError: Error {
         NSError(domain: URLError.errorDomain, code: URLError.notConnectedToInternet.rawValue)
+    }
+
+    private var currentDate: Date {
+        Date.now()
     }
 
     func parameterizedTest(testCases: [TestCase], expectation: XCTestExpectation, exerciseSUT: (TestCase) -> Void) {
@@ -292,30 +296,30 @@ extension HomePresenterTests {
 final class HomeViewSpy: HomeView {
 
     struct Expect {
-        private(set) var showLoadingViewCallCount: Int
-        private(set) var hideLoadingViewCallCount: Int
-        private(set) var showRefreshControlCallCount: Int
-        private(set) var hideRefreshControlCallCount: Int
-        private(set) var reloadDataCallCount: Int
+        private(set) var showLoadingViewArgs: [Void]
+        private(set) var hideLoadingViewArgs: [Void]
+        private(set) var showRefreshControlArgs: [Void]
+        private(set) var hideRefreshControlArgs: [Void]
+        private(set) var reloadDataArgs: [Void]
 
-        init(showLoadingViewCallCount: Int,
-             hideLoadingViewCallCount: Int,
-             showRefreshControlCallCount: Int,
-             hideRefreshControlCallCount: Int,
-             reloadDataCallCount: Int) {
-            self.showLoadingViewCallCount = showLoadingViewCallCount
-            self.hideLoadingViewCallCount = hideLoadingViewCallCount
-            self.showRefreshControlCallCount = showRefreshControlCallCount
-            self.hideRefreshControlCallCount = hideRefreshControlCallCount
-            self.reloadDataCallCount = reloadDataCallCount
+        init(showLoadingViewArgs: [Void],
+             hideLoadingViewArgs: [Void],
+             showRefreshControlArgs: [Void],
+             hideRefreshControlArgs: [Void],
+             reloadDataArgs: [Void]) {
+            self.showLoadingViewArgs = showLoadingViewArgs
+            self.hideLoadingViewArgs = hideLoadingViewArgs
+            self.showRefreshControlArgs = showRefreshControlArgs
+            self.hideRefreshControlArgs = hideRefreshControlArgs
+            self.reloadDataArgs = reloadDataArgs
         }
     }
 
-    private var showLoadingViewCallCount: Int = 0
-    private var hideLoadingViewCallCount: Int = 0
-    private var showRefreshControlCallCount: Int = 0
-    private var hideRefreshControlCallCount: Int = 0
-    private var reloadDataCallCount: Int = 0
+    private var showLoadingViewArgs: [Void] = []
+    private var hideLoadingViewArgs: [Void] = []
+    private var showRefreshControlArgs: [Void] = []
+    private var hideRefreshControlArgs: [Void] = []
+    private var reloadDataArgs: [Void] = []
 
     private var expect: Expect
 
@@ -324,57 +328,57 @@ final class HomeViewSpy: HomeView {
     }
 
     func showLoadingView() {
-        showLoadingViewCallCount += 1
+        showLoadingViewArgs.append(())
     }
 
     func hideLoadingView() {
-        hideLoadingViewCallCount += 1
+        hideLoadingViewArgs.append(())
     }
 
     func showRefreshControl() {
-        showRefreshControlCallCount += 1
+        showRefreshControlArgs.append(())
     }
 
     func hideRefreshControl() {
-        hideRefreshControlCallCount += 1
+        hideRefreshControlArgs.append(())
     }
 
     func reloadData() {
-        reloadDataCallCount += 1
+        reloadDataArgs.append(())
     }
 
     // Reset call counts
 
     func resetCallCounts() {
-        showLoadingViewCallCount = 0
-        hideLoadingViewCallCount = 0
-        showRefreshControlCallCount = 0
-        hideRefreshControlCallCount = 0
-        reloadDataCallCount = 0
+        showLoadingViewArgs = []
+        hideLoadingViewArgs = []
+        showRefreshControlArgs = []
+        hideRefreshControlArgs = []
+        reloadDataArgs = []
     }
 
     // Verify
     func verify(line: UInt) {
-        XCTAssertEqual(showLoadingViewCallCount, expect.showLoadingViewCallCount, "showLoadingViewCallCount", line: line)
-        XCTAssertEqual(hideLoadingViewCallCount, expect.hideLoadingViewCallCount, "hideLoadingViewCallCount", line: line)
-        XCTAssertEqual(showRefreshControlCallCount, expect.showRefreshControlCallCount, "showRefreshControlCallCount", line: line)
-        XCTAssertEqual(hideRefreshControlCallCount, expect.hideRefreshControlCallCount, "hideRefreshControlCallCount", line: line)
-        XCTAssertEqual(reloadDataCallCount, expect.reloadDataCallCount, "reloadDataCallCount", line: line)
+        XCTAssertEqual(showLoadingViewArgs.count, expect.showLoadingViewArgs.count, "showLoadingViewArgs.count", line: line)
+        XCTAssertEqual(hideLoadingViewArgs.count, expect.hideLoadingViewArgs.count, "hideLoadingViewArgs.count", line: line)
+        XCTAssertEqual(showRefreshControlArgs.count, expect.showRefreshControlArgs.count, "showRefreshControlArgs.count", line: line)
+        XCTAssertEqual(hideRefreshControlArgs.count, expect.hideRefreshControlArgs.count, "hideRefreshControlArgs.count", line: line)
+        XCTAssertEqual(reloadDataArgs.count, expect.reloadDataArgs.count, "reloadDataArgs.count", line: line)
     }
 }
 
 final class HomeWireframeSpy: HomeWireframe {
 
     struct Expect {
-        private(set) var openExternalBrowserCallCount: Int
+        private(set) var openExternalBrowserArgs: [String]
 
-        init(openExternalBrowserCallCount: Int) {
-            self.openExternalBrowserCallCount = openExternalBrowserCallCount
+        init(openExternalBrowserArgs: [String]) {
+            self.openExternalBrowserArgs = openExternalBrowserArgs
         }
     }
 
     weak var viewController: UIViewController?
-    private var openExternalBrowserCallCount: Int = 0
+    private var openExternalBrowserArgs: [String] = []
 
     private var expect: Expect
 
@@ -384,35 +388,39 @@ final class HomeWireframeSpy: HomeWireframe {
     }
 
     func openExternalBrowser(by urlString: String) {
-        openExternalBrowserCallCount += 1
+        openExternalBrowserArgs.append(urlString)
     }
 
     // Reset call counts
 
     func resetCallCounts() {
-        openExternalBrowserCallCount = 0
+        openExternalBrowserArgs = []
     }
 
     // Verify
     func verify(line: UInt) {
-        XCTAssertEqual(openExternalBrowserCallCount, expect.openExternalBrowserCallCount, "openExternalBrowserCallCount", line: line)
+        if expect.openExternalBrowserArgs.isEmpty {
+            XCTAssertEqual(openExternalBrowserArgs.count, expect.openExternalBrowserArgs.count, "openExternalBrowserArgs.count", line: line)
+        } else {
+            XCTAssertEqual(openExternalBrowserArgs[0], expect.openExternalBrowserArgs[0], "openExternalBrowserArgs[0]", line: line)
+        }
     }
 }
 
 final class HomeUseCaseSpy: HomeUseCase {
 
     struct Expect {
-        private(set) var getHomeViewDataCallCount: Int
-        private(set) var cancelHomeViewDataRequestCallCount: Int
+        private(set) var getHomeViewDataArgs: [(since: Int, currentDate: Date, deleteCache: Bool)]
+        private(set) var cancelHomeViewDataRequestArgs: [Void]
 
-        init(getHomeViewDataCallCount: Int, cancelHomeViewDataRequestCallCount: Int) {
-            self.getHomeViewDataCallCount = getHomeViewDataCallCount
-            self.cancelHomeViewDataRequestCallCount = cancelHomeViewDataRequestCallCount
+        init(getHomeViewDataArgs: [(since: Int, currentDate: Date, deleteCache: Bool)], cancelHomeViewDataRequestArgs: [Void]) {
+            self.getHomeViewDataArgs = getHomeViewDataArgs
+            self.cancelHomeViewDataRequestArgs = cancelHomeViewDataRequestArgs
         }
     }
 
-    private var getHomeViewDataCallCount: Int = 0
-    private var cancelHomeViewDataRequestCallCount: Int = 0
+    private var getHomeViewDataArgs: [(since: Int, currentDate: Date, deleteCache: Bool)] = []
+    private var cancelHomeViewDataRequestArgs: [Void] = []
     private var getHomeViewDataResult: GetHomeViewDataResult
 
     private var expect: Expect
@@ -422,25 +430,31 @@ final class HomeUseCaseSpy: HomeUseCase {
         self.expect = expect
     }
 
-    func getHomeViewData(since: Int, deleteCache: Bool, completion: @escaping Completion) {
-        getHomeViewDataCallCount += 1
+    func getHomeViewData(since: Int, currentDate: Date, deleteCache: Bool, completion: @escaping Completion) {
+        getHomeViewDataArgs.append((since: since, currentDate: currentDate, deleteCache: deleteCache))
         completion(self.getHomeViewDataResult)
     }
 
     func cancelHomeViewDataRequest() {
-        cancelHomeViewDataRequestCallCount += 1
+        cancelHomeViewDataRequestArgs.append(())
     }
 
     // Reset call counts
 
     func resetCallCounts() {
-        getHomeViewDataCallCount = 0
-        cancelHomeViewDataRequestCallCount = 0
+        getHomeViewDataArgs = []
+        cancelHomeViewDataRequestArgs = []
     }
 
     // Verify
     func verify(line: UInt) {
-        XCTAssertEqual(getHomeViewDataCallCount, expect.getHomeViewDataCallCount, "getHomeViewDataCallCount", line: line)
-        XCTAssertEqual(cancelHomeViewDataRequestCallCount, expect.cancelHomeViewDataRequestCallCount, "cancelHomeViewDataRequestCallCount", line: line)
+        if expect.getHomeViewDataArgs.isEmpty {
+            XCTAssertEqual(getHomeViewDataArgs.count, expect.getHomeViewDataArgs.count, "getHomeViewDataArgs.count", line: line)
+        } else {
+            // Verifying of the currentDate parameter has been omitted because it was verified in the UseCase test.
+            XCTAssertEqual(getHomeViewDataArgs[0].since, expect.getHomeViewDataArgs[0].since, "getHomeViewDataArgs[0].since", line: line)
+            XCTAssertEqual(getHomeViewDataArgs[0].deleteCache, expect.getHomeViewDataArgs[0].deleteCache, "getHomeViewDataArgs[0].deleteCache", line: line)
+        }
+        XCTAssertEqual(cancelHomeViewDataRequestArgs.count, expect.cancelHomeViewDataRequestArgs.count, "cancelHomeViewDataRequestArgs", line: line)
     }
 }

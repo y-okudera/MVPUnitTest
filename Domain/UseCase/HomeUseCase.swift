@@ -18,7 +18,7 @@ public enum HomeUseCaseProvider {
 
 public protocol HomeUseCase: AnyObject {
     typealias Completion = (Result<HomeViewData, Error>) -> Void
-    func getHomeViewData(since: Int, deleteCache: Bool, completion: @escaping Completion)
+    func getHomeViewData(since: Int, currentDate: Date, deleteCache: Bool, completion: @escaping Completion)
     func cancelHomeViewDataRequest()
 }
 
@@ -32,9 +32,9 @@ final class HomeUseCaseImpl: HomeUseCase {
         self.refreshInterval = refreshInterval
     }
 
-    func getHomeViewData(since: Int, deleteCache: Bool, completion: @escaping Completion) {
+    func getHomeViewData(since: Int, currentDate: Date, deleteCache: Bool, completion: @escaping Completion) {
         Logger.debug()
-        repository.getGitHubUsers(since: since, refreshInterval: refreshInterval, deleteCache: deleteCache) { result in
+        repository.getGitHubUsers(since: since, currentDate: currentDate, refreshInterval: refreshInterval, deleteCache: deleteCache) { result in
             let translatedResult = result.map { GitHubUsersTranslator.translate($0) }
             switch translatedResult {
             case .success(let homeViewData):

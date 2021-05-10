@@ -316,16 +316,6 @@ targets:
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
  ####################
-  # UnitTestターゲット
-  MVPAppTests:
-    type: bundle.unit-test
-    platform: iOS
-    settings:
-      ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
-      BUNDLE_NAME: 'MVPApp.tests'
-    sources: MVPAppTests
-    dependencies:
-      - target: MVPApp
   # Data.frameworkのUnitTestターゲット
   DataTests:
     type: bundle.unit-test
@@ -388,14 +378,12 @@ schemeTemplates:
     build:
       targets:
         MVPApp: all
-        MVPAppTests: [test]
         MVPAppUITests: [test]
     run:
       config: ${debugConfig}
     test:
       config: ${debugConfig}
       targets:
-        - MVPAppTests
         - MVPAppUITests
     profile:
       config: ${releaseConfig}

@@ -20,7 +20,7 @@ final class GitHubUsersRequestTests: XCTestCase {
     }
 
     // MARK: - init(since: ) tests
-    
+
     func testInit() throws {
 
         // Exercise SUT

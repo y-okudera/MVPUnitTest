@@ -42,7 +42,7 @@ extension APIError {
             }
             Logger.error("APIError.errorResponse")
             self = .errorResponse(errorResponse, statusCode: code)
-            
+
         case .responseSerializationFailed:
             guard let errorResponse = Self.decode(errorResponseData: responseData) else {
                 Logger.error("APIError.others")

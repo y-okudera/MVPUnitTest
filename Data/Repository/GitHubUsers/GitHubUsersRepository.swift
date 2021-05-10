@@ -22,7 +22,7 @@ public protocol GitHubUsersRepository {
     typealias Response = [GitHubUserEntity]
     typealias ErrorResponse = CommonErrorResponse
     typealias Completion = (Result<Response, APIError<ErrorResponse>>) -> Void
-    func getGitHubUsers(since: Int, refreshInterval: TimeInterval, deleteCache: Bool, completion: @escaping Completion)
+    func getGitHubUsers(since: Int, currentDate: Date, refreshInterval: TimeInterval, deleteCache: Bool, completion: @escaping Completion)
     func cancelRequest()
 }
 
@@ -36,12 +36,12 @@ final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
         self.dbDataStore = dbDataStore
     }
 
-    func getGitHubUsers(since: Int, refreshInterval: TimeInterval, deleteCache: Bool, completion: @escaping Completion) {
+    func getGitHubUsers(since: Int, currentDate: Date, refreshInterval: TimeInterval, deleteCache: Bool, completion: @escaping Completion) {
 
         if deleteCache {
             dbDataStore.deleteAll(completion: nil)
         } else if let cachedData = dbDataStore.find(since: since) {
-            let elapsedTime = Date().timeIntervalSince(cachedData.lastModified)
+            let elapsedTime = currentDate.timeIntervalSince(cachedData.lastModified)
             if elapsedTime < refreshInterval {
                 Logger.debug("Get the GitHub Users from DB.")
                 completion(.success(Array(cachedData.responseList)))
@@ -53,12 +53,13 @@ final class GitHubUsersRepositoryImpl: GitHubUsersRepository {
         apiDataStore.getGitHubUsers(since: since) { [weak self] result in
             switch result {
             case .success(let response):
-                let usersCacheEntity = GitHubUsersCacheEntity(since: since, lastModified: Date(), response: response)
-                self?.dbDataStore.add(entity: usersCacheEntity, completion: nil)
+                let usersCacheEntity = GitHubUsersCacheEntity(since: since, lastModified: currentDate, response: response)
+                self?.dbDataStore.add(entity: usersCacheEntity) { _ in
+                    completion(result)
+                }
             case .failure:
-                break
+                completion(result)
             }
-            completion(result)
         }
     }
 

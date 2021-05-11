@@ -22,7 +22,7 @@ excluded:
   - Carthage/
   - vendor/
   - ./**/Generated/
-  - ComicChatUITests/
+  - MVPAppUITests/
   - DataTests/
   - DomainTests/
   - PresentationTests/
